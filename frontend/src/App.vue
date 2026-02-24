@@ -441,9 +441,9 @@ const addTransaction = async () => {
 
   // Add to your expenses array (replace with API call)
   console.log('Adding transaction:', transaction)
-  await api.createExpense(transaction)
+  const created = await api.createExpense(transaction)
   triggerConfetti()
-  expenses.value.push(transaction)
+  expenses.value.push(created?.data || transaction)
 
   // Reset form
   newTransaction.value = {
@@ -467,6 +467,9 @@ onMounted(async () => {
     const fetchExpenses = await api.getExpenses();
     expenses.value = fetchExpenses.data;
   } catch (error) {
+    if (error?.code === 'permission-denied' || String(error?.message || '').includes('Missing or insufficient permissions')) {
+      showToast('Firebase permission denied. Update Firestore rules for expenses collection.', 'danger', 'bi-shield-exclamation')
+    }
     console.error('Failed to fetch expenses:', error);
   }
 
@@ -524,7 +527,9 @@ const animateProgressBars = () => {
 }
 
 const sortedExpenses = computed(() => {
-  return [...expenses.value].sort((a, b) => new Date(b.date) - new Date(a.date))
+  return [...expenses.value].sort(
+    (a, b) => new Date(b.expense_date || b.date) - new Date(a.expense_date || a.date)
+  )
 })
 
 const filteredExpenses = computed(() => {

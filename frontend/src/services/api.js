@@ -1,11 +1,16 @@
 // services/api.js
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+
 const API_BASE_URL = 'http://localhost:3000/api';
+const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT || import.meta.env.ENVIRONMENT || 'development';
+const IS_PRODUCTION = ENVIRONMENT === 'production';
+const EXPENSES_COLLECTION = 'expenses';
 
 class ExpenseAPI {
-  // Generic request handler
   static async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -33,54 +38,111 @@ class ExpenseAPI {
     }
   }
 
-  // Get all expenses with optional filters
   static async getExpenses(filters = {}) {
-    const queryParams = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) queryParams.append(key, value);
-    });
+    if (!IS_PRODUCTION) {
+      const queryParams = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
+      });
 
-    const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
-    return this.request(`/expenses${query}`);
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      return this.request(`/expenses${query}`);
+    }
+
+    const snapshot = await getDocs(collection(db, EXPENSES_COLLECTION));
+    let data = snapshot.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() }));
+
+    if (filters && Object.keys(filters).length > 0) {
+      data = data.filter((item) => Object.entries(filters).every(([key, value]) => !value || item[key] === value));
+    }
+
+    return { data };
   }
 
-  // Get single expense
   static async getExpense(id) {
-    return this.request(`/expenses/${id}`);
+    if (!IS_PRODUCTION) {
+      return this.request(`/expenses/${id}`);
+    }
+
+    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
+    const snapshot = await getDoc(docRef);
+
+    if (!snapshot.exists()) {
+      throw new Error('Expense not found');
+    }
+
+    return { data: { id: snapshot.id, ...snapshot.data() } };
   }
 
-  // Create expense
   static async createExpense(expenseData) {
-    return this.request('/expenses', {
-      method: 'POST',
-      body: expenseData
-    });
+    if (!IS_PRODUCTION) {
+      return this.request('/expenses', {
+        method: 'POST',
+        body: expenseData
+      });
+    }
+
+    const docRef = await addDoc(collection(db, EXPENSES_COLLECTION), expenseData);
+    return { data: { id: docRef.id, ...expenseData } };
   }
 
-  // Update expense
   static async updateExpense(id, expenseData) {
-    return this.request(`/expenses/${id}`, {
-      method: 'PUT',
-      body: expenseData
-    });
+    if (!IS_PRODUCTION) {
+      return this.request(`/expenses/${id}`, {
+        method: 'PUT',
+        body: expenseData
+      });
+    }
+
+    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
+    await updateDoc(docRef, expenseData);
+    return { data: { id, ...expenseData } };
   }
 
-  // Delete expense
   static async deleteExpense(id) {
-    return this.request(`/expenses/${id}`, {
-      method: 'DELETE'
-    });
+    if (!IS_PRODUCTION) {
+      return this.request(`/expenses/${id}`, {
+        method: 'DELETE'
+      });
+    }
+
+    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
+    await deleteDoc(docRef);
+    return { data: { id } };
   }
 
-  // Get summary statistics
   static async getSummary() {
-    return this.request('/expenses/summary');
+    if (!IS_PRODUCTION) {
+      return this.request('/expenses/summary');
+    }
+
+    const { data } = await this.getExpenses();
+    const summary = data.reduce(
+      (acc, item) => {
+        const amount = Number(item.amount || 0);
+        if (item.expense_income === 'Income') acc.totalIncome += amount;
+        if (item.expense_income === 'Expense') acc.totalExpenses += amount;
+        return acc;
+      },
+      { totalIncome: 0, totalExpenses: 0 }
+    );
+
+    return { data: { ...summary, balance: summary.totalIncome - summary.totalExpenses } };
   }
 
-  // Get category breakdown
   static async getCategories() {
-    return this.request('/expenses/categories');
+    if (!IS_PRODUCTION) {
+      return this.request('/expenses/categories');
+    }
+
+    const { data } = await this.getExpenses();
+    const categories = data.reduce((acc, item) => {
+      const amount = Number(item.amount || 0);
+      acc[item.category] = (acc[item.category] || 0) + amount;
+      return acc;
+    }, {});
+
+    return { data: categories };
   }
 }
 
