@@ -154,7 +154,7 @@
                         <div class="flex-grow-1 ms-3">
                           <div class="d-flex justify-content-between mb-1">
                             <span class="fw-semibold harmony-text-dark">{{ category }}</span>
-                            <span class="fw-bold harmony-text-primary">${{ amount.toFixed(2) }}</span>
+                            <span class="fw-bold harmony-text-primary">${{ amount }}</span>
                           </div>
                           <div class="progress progress-animated" style="height: 8px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated harmony-progress"
@@ -209,14 +209,14 @@
                           <td class="ps-4">
                             <div class="d-flex align-items-center">
                               <div class="date-badge harmony-gradient-primary me-2">
-                                <span class="day">{{ formatDay(expense.date) }}</span>
-                                <span class="month">{{ formatMonth(expense.date) }}</span>
+                                <span class="day">{{ formatDay(expense.expense_date) }}</span>
+                                <span class="month">{{ formatMonth(expense.expense_date) }}</span>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div class="fw-semibold harmony-text-dark">{{ expense.description }}</div>
-                            <small class="harmony-text-muted">{{ formatTime(expense.date) }}</small>
+                            <small class="harmony-text-muted">{{ formatTime(expense.expense_date) }}</small>
                           </td>
                           <td>
                             <span class="badge category-badge harmony-badge"
@@ -226,7 +226,7 @@
                             </span>
                           </td>
                           <td class="fw-bold harmony-text-expense amount-cell">
-                            <span class="amount-value">-${{ expense.amount.toFixed(2) }}</span>
+                            <span class="amount-value">-${{ expense.amount }}</span>
                           </td>
                           <td class="text-center">
                             <button @click="deleteExpense(expense.id)" class="btn btn-delete harmony-btn-delete btn-sm"
@@ -279,6 +279,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
+import api from './services/api'
 
 const mounted = ref(false)
 const isSubmitting = ref(false)
@@ -304,7 +305,11 @@ const harmonyColors = {
   'Entertainment': 'accent2',
   'Bills': 'neutral',
   'Health': 'accent1',
-  'Other': 'muted'
+  'Other': 'muted',
+  'Salary': 'accent2',
+  'Bonus': 'accent2',
+  'Send Transfer': 'accent3',
+  'Get Transfer': 'accent1'
 }
 
 const sampleExpenses = [
@@ -326,9 +331,13 @@ const newExpense = ref({
   date: new Date().toISOString().split('T')[0]
 })
 
-onMounted(() => {
-  const saved = localStorage.getItem('expenses')
-  expenses.value = saved ? JSON.parse(saved) : [...sampleExpenses]
+onMounted(async () => {
+  try {
+    const fetchExpenses = await api.getExpenses();
+    expenses.value = fetchExpenses.data;
+  } catch (error) {
+    console.error('Failed to fetch expenses:', error);
+  }
 
   setTimeout(() => {
     mounted.value = true
@@ -392,16 +401,24 @@ const filteredExpenses = computed(() => {
   return sortedExpenses.value.filter(e => e.category === filter.value)
 })
 
-const totalExpenses = computed(() => {
-  return expenses.value.reduce((sum, e) => sum + e.amount, 0)
+const totalIncome = computed(() => {
+  return expenses.value
+    .filter(e => ['Income'].includes(e.expense_income))
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
 })
 
-const totalBalance = computed(() => 2500 - totalExpenses.value)
+const totalExpenses = computed(() => {
+  return expenses.value
+    .filter(e => ['Expense'].includes(e.expense_income))
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+})
+
+const totalBalance = computed(() => totalIncome.value - totalExpenses.value)
 
 const categoryTotals = computed(() => {
   const totals = {}
   expenses.value.forEach(e => {
-    totals[e.category] = (totals[e.category] || 0) + e.amount
+    totals[e.category] = (totals[e.category] || 0) + parseFloat(e.amount);
   })
   return totals
 })
@@ -585,7 +602,11 @@ const getCategoryIcon = (category) => {
     'Entertainment': 'bi-film',
     'Bills': 'bi-receipt',
     'Health': 'bi-heart-pulse',
-    'Other': 'bi-box'
+    'Other': 'bi-box',
+    'send transfer': 'bi-arrow-up-right',
+    'Salary': 'bi-cash-stack',
+    'Bonus': 'bi-gift',
+    'Get Transfer': 'bi-arrow-down-left'
   }
   return icons[category] || 'bi-circle'
 }

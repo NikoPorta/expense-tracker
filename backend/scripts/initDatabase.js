@@ -30,8 +30,9 @@ const initDatabase = async () => {
       CREATE TABLE IF NOT EXISTS expenses (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         description VARCHAR(255) NOT NULL,
+        expense_income ENUM('Expense', 'Income') NOT NULL DEFAULT 'Expense',
         amount DECIMAL(10, 2) NOT NULL,
-        category ENUM('Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other') NOT NULL,
+        category ENUM('Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Send Transfer', 'Salary', 'Bonus', 'Get Transfer', 'Other') NOT NULL,
         expense_date DATE NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -48,18 +49,22 @@ const initDatabase = async () => {
     
     if (rows[0].count === 0) {
       const sampleData = [
-        ['Weekly Groceries', 156.43, 'Food', '2024-01-15'],
-        ['Uber Ride to Airport', 24.50, 'Transport', '2024-01-14'],
-        ['Netflix Subscription', 15.99, 'Entertainment', '2024-01-13'],
-        ['Electric Bill', 89.00, 'Bills', '2024-01-12'],
-        ['Nike Air Max', 120.00, 'Shopping', '2024-01-11'],
-        ['Pharmacy - Vitamins', 45.67, 'Health', '2024-01-10'],
-        ['Team Lunch', 68.50, 'Food', '2024-01-09'],
-        ['Gas Station Shell', 55.00, 'Transport', '2024-01-08']
+        ['Weekly Groceries', 'Expense', 156.43, 'Food', '2024-01-15'],
+        ['Uber Ride to Airport', 'Expense', 24.50, 'Transport', '2024-01-14'],
+        ['Netflix Subscription', 'Expense', 15.99, 'Entertainment', '2024-01-13'],
+        ['Electric Bill', 'Expense', 89.00, 'Bills', '2024-01-12'],
+        ['Nike Air Max', 'Expense', 120.00, 'Shopping', '2024-01-11'],
+        ['Pharmacy - Vitamins', 'Expense', 45.67, 'Health', '2024-01-10'],
+        ['Team Lunch', 'Expense', 68.50, 'Food', '2024-01-09'],
+        ['Gas Station Shell', 'Expense', 55.00, 'Transport', '2024-01-08'],
+        ['Spotify Subscription', 'Expense', 9.99, 'Entertainment', '2024-01-07'],
+        ['Water Bill', 'Expense', 30.00, 'Bills', '2024-01-06'],
+        ['Amazon Echo Dot', 'Expense', 49.99, 'Shopping', '2024-01-05'],
+        ['February Salary', 'Income', 3500.00, 'Salary', '2024-01-31'],
       ];
 
       await connection.query(`
-        INSERT INTO expenses (description, amount, category, expense_date) 
+        INSERT INTO expenses (description, expense_income, amount, category, expense_date) 
         VALUES ?
       `, [sampleData]);
 
