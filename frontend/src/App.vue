@@ -58,70 +58,142 @@
         </div>
 
         <div class="row g-4">
-          <!-- Add Expense Form -->
+          <!-- Add Transaction Form (Expense/Income Toggle) -->
           <div class="col-lg-4">
             <div class="card form-card sticky-top harmony-shadow" :class="{ 'slide-in-left': mounted }"
               style="top: 20px; animation-delay: 0.8s;">
               <div class="card-header border-0 pt-4 px-4 bg-transparent">
-                <h4 class="mb-0 fw-bold harmony-text-gradient">
-                  <i class="bi bi-plus-circle-fill me-2 pulse-icon harmony-text-primary"></i>
-                  Add Expense
-                </h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="mb-0 fw-bold harmony-text-gradient">
+                    <i class="bi me-2 pulse-icon"
+                      :class="transactionType === 'expense' ? 'bi-dash-circle-fill harmony-text-expense' : 'bi-plus-circle-fill harmony-text-accent1'"></i>
+                    {{ transactionType === 'expense' ? 'Add Expense' : 'Add Income' }}
+                  </h4>
+                </div>
+
+                <!-- Toggle Switch -->
+                <div class="transaction-toggle-wrapper">
+                  <div class="transaction-toggle" :class="{ 'income-active': transactionType === 'income' }"
+                    @click="toggleTransactionType">
+                    <div class="toggle-slider">
+                      <div class="toggle-option expense-option" :class="{ active: transactionType === 'expense' }">
+                        <i class="bi bi-arrow-down-circle"></i>
+                        <span>Expense</span>
+                      </div>
+                      <div class="toggle-option income-option" :class="{ active: transactionType === 'income' }">
+                        <i class="bi bi-arrow-up-circle"></i>
+                        <span>Income</span>
+                      </div>
+                      <div class="toggle-indicator"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <div class="card-body p-4">
-                <form @submit.prevent="addExpense" class="needs-validation" novalidate>
+                <form @submit.prevent="addTransaction" class="needs-validation" novalidate>
+                  <!-- Transaction Type Indicator -->
+                  <div class="transaction-type-badge mb-3"
+                    :class="transactionType === 'expense' ? 'expense-badge' : 'income-badge'">
+                    <i class="bi"
+                      :class="transactionType === 'expense' ? 'bi-arrow-down-circle-fill' : 'bi-arrow-up-circle-fill'"></i>
+                    <span>You're adding an {{ transactionType }}</span>
+                  </div>
+
                   <div class="form-floating mb-3 input-group-animated">
-                    <input v-model="newExpense.description" type="text" class="form-control harmony-input"
-                      id="descInput" placeholder="Description" required @focus="activeField = 'desc'"
-                      @blur="activeField = null">
+                    <input v-model="newTransaction.description" type="text" class="form-control harmony-input"
+                      :class="{ 'income-input': transactionType === 'income' }" id="descInput" placeholder="Description"
+                      required @focus="activeField = 'desc'" @blur="activeField = null">
                     <label for="descInput" class="harmony-label">
-                      <i class="bi bi-pencil me-2 harmony-text-primary"></i>Description
+                      <i class="bi bi-pencil me-2"
+                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      Description
                     </label>
-                    <div class="input-line harmony-line" :class="{ 'active': activeField === 'desc' }"></div>
+                    <div class="input-line harmony-line" :class="{
+                      'active': activeField === 'desc',
+                      'income-line': transactionType === 'income'
+                    }"></div>
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
-                    <input v-model.number="newExpense.amount" type="number" step="0.01" min="0.01"
-                      class="form-control harmony-input" id="amountInput" placeholder="Amount" required
-                      @focus="activeField = 'amount'" @blur="activeField = null">
-                    <label for="amountInput" class="harmony-label">
-                      <i class="bi bi-currency-dollar me-2 harmony-text-primary"></i>Amount
-                    </label>
-                    <div class="input-line harmony-line" :class="{ 'active': activeField === 'amount' }"></div>
+                    <div class="amount-input-wrapper">
+                      <span class="currency-symbol"
+                        :class="transactionType === 'expense' ? 'expense-symbol' : 'income-symbol'">
+                        {{ transactionType === 'expense' ? '-' : '+' }}
+                      </span>
+                      <input v-model.number="newTransaction.amount" type="number" step="0.01" min="0"
+                        class="form-control harmony-input amount-input" :class="{
+                          'income-input': transactionType === 'income',
+                          'is-invalid': validationErrors?.amount
+                        }" id="amountInput" placeholder="0.00" required @focus="activeField = 'amount'"
+                        @blur="activeField = null" :aria-label="'Enter ' + transactionType + ' amount'">
+                    </div>
+                    <div class="input-line harmony-line" :class="{
+                      'active': activeField === 'amount',
+                      'income-line': transactionType === 'income'
+                    }"></div>
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
-                    <select v-model="newExpense.category" class="form-select harmony-input" id="categoryInput" required
+                    <select v-model="newTransaction.category" class="form-select harmony-input"
+                      :class="{ 'income-input': transactionType === 'income' }" id="categoryInput" required
                       @focus="activeField = 'category'" @blur="activeField = null">
                       <option value="" disabled selected>Select category</option>
-                      <option value="Food">🍔 Food & Dining</option>
-                      <option value="Transport">🚗 Transport</option>
-                      <option value="Shopping">🛍️ Shopping</option>
-                      <option value="Entertainment">🎬 Entertainment</option>
-                      <option value="Bills">💡 Bills & Utilities</option>
-                      <option value="Health">🏥 Health</option>
-                      <option value="Other">📦 Other</option>
+
+                      <!-- Expense Categories -->
+                      <optgroup v-if="transactionType === 'expense'" label="Expense Categories">
+                        <option value="Food">🍔 Food & Dining</option>
+                        <option value="Transport">🚗 Transport</option>
+                        <option value="Shopping">🛍️ Shopping</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
+                        <option value="Bills">💡 Bills & Utilities</option>
+                        <option value="Health">🏥 Health</option>
+                        <option value="Send Transfer">📈 Send Transfer</option>
+                        <option value="Other">📦 Other</option>
+                      </optgroup>
+
+                      <!-- Income Categories -->
+                      <optgroup v-else label="Income Categories">
+                        <option value="Salary">💼 Salary</option>
+                        <option value="Get Transfer">📈 Get Transfer</option>
+                        <option value="Bonus">🎁 Bonus</option>
+                      </optgroup>
                     </select>
                     <label for="categoryInput" class="harmony-label">
-                      <i class="bi bi-tag me-2 harmony-text-primary"></i>Category
+                      <i class="bi bi-tag me-2"
+                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      Category
                     </label>
-                    <div class="input-line harmony-line" :class="{ 'active': activeField === 'category' }"></div>
+                    <div class="input-line harmony-line" :class="{
+                      'active': activeField === 'category',
+                      'income-line': transactionType === 'income'
+                    }"></div>
                   </div>
 
                   <div class="form-floating mb-4 input-group-animated">
-                    <input v-model="newExpense.date" type="date" class="form-control harmony-input" id="dateInput"
-                      required @focus="activeField = 'date'" @blur="activeField = null">
+                    <input v-model="newTransaction.expense_date" type="date" class="form-control harmony-input"
+                      :class="{ 'income-input': transactionType === 'income' }" id="dateInput" required
+                      @focus="activeField = 'date'" @blur="activeField = null">
                     <label for="dateInput" class="harmony-label">
-                      <i class="bi bi-calendar me-2 harmony-text-primary"></i>Date
+                      <i class="bi bi-calendar me-2"
+                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      Date
                     </label>
-                    <div class="input-line harmony-line" :class="{ 'active': activeField === 'date' }"></div>
+                    <div class="input-line harmony-line" :class="{
+                      'active': activeField === 'date',
+                      'income-line': transactionType === 'income'
+                    }"></div>
                   </div>
 
-                  <button type="submit" class="btn btn-primary w-100 btn-lg submit-btn harmony-btn"
-                    :class="{ 'loading': isSubmitting }">
+                  <button type="submit" class="btn w-100 btn-lg submit-btn" :class="[
+                    transactionType === 'expense' ? 'harmony-btn-expense' : 'harmony-btn-income',
+                    { 'loading': isSubmitting }
+                  ]">
                     <span class="btn-content">
-                      <i class="bi bi-plus-lg me-2"></i>
-                      <span v-if="!isSubmitting">Add Expense</span>
+                      <i class="bi me-2" :class="transactionType === 'expense' ? 'bi-plus-lg' : 'bi-plus-lg'"></i>
+                      <span v-if="!isSubmitting">
+                        Add {{ transactionType === 'expense' ? 'Expense' : 'Income' }}
+                      </span>
                       <span v-else class="spinner-border spinner-border-sm"></span>
                     </span>
                     <div class="btn-ripple"></div>
@@ -225,8 +297,14 @@
                               {{ expense.category }}
                             </span>
                           </td>
-                          <td class="fw-bold harmony-text-expense amount-cell">
-                            <span class="amount-value">-${{ expense.amount }}</span>
+                          <td class="fw-bold"
+                            :class="expense.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
+                            <span v-if="expense.expense_income === 'Income'" class="amount-value income-amount">
+                              +${{ expense.amount }}
+                            </span>
+                            <span v-else class="amount-value">
+                              -${{ expense.amount }}
+                            </span>
                           </td>
                           <td class="text-center">
                             <button @click="deleteExpense(expense.id)" class="btn btn-delete harmony-btn-delete btn-sm"
@@ -284,11 +362,13 @@ import api from './services/api'
 const mounted = ref(false)
 const isSubmitting = ref(false)
 const activeField = ref(null)
+const transactionType = ref('expense') // 'expense' or 'income'
 const headerText = ref('')
 const fullHeaderText = 'Daily Expense Tracker'
 const toasts = ref([])
 const confettiCanvas = ref(null)
 const filter = ref('all')
+const validationErrors = ref({})
 
 // Harmony Color Palette
 // Primary: Teal (#0D9488) - Main brand color
@@ -330,6 +410,57 @@ const newExpense = ref({
   category: '',
   date: new Date().toISOString().split('T')[0]
 })
+
+const newTransaction = ref({
+  description: '',
+  amount: '',
+  category: '',
+  expense_date: new Date().toISOString().split('T')[0],
+  expense_income: 'expense'
+})
+
+// Toggle between expense and income
+const toggleTransactionType = () => {
+  transactionType.value = transactionType.value === 'expense' ? 'income' : 'expense'
+  newTransaction.value.expense_income = transactionType.value
+  newTransaction.value.category = '' // Reset category when switching
+}
+
+// Add transaction
+const addTransaction = async () => {
+  isSubmitting.value = true
+
+  await new Promise(resolve => setTimeout(resolve, 600))
+
+  const transaction = {
+    ...newTransaction.value,
+    expense_income: transactionType.value === 'expense'
+      ? "Expense"
+      : "Income"
+  }
+
+  // Add to your expenses array (replace with API call)
+  console.log('Adding transaction:', transaction)
+  await api.createExpense(transaction)
+  triggerConfetti()
+  expenses.value.push(transaction)
+
+  // Reset form
+  newTransaction.value = {
+    description: '',
+    amount: '',
+    category: '',
+    expense_date: new Date().toISOString().split('T')[0],
+    expense_income: transactionType.value
+  }
+
+  nextTick(() => {
+    animateCounters()
+    animateProgressBars()
+  })
+
+  isSubmitting.value = false
+}
 
 onMounted(async () => {
   try {
@@ -486,9 +617,9 @@ const addExpense = async () => {
   })
 }
 
-const deleteExpense = (id) => {
+const deleteExpense = async (id) => {
+  await api.deleteExpense(id)
   expenses.value = expenses.value.filter(e => e.id !== id)
-  saveExpenses()
   showToast('Expense deleted', 'danger', 'bi-trash')
   animateCounters()
 }
@@ -654,6 +785,8 @@ const getCategoryIcon = (category) => {
   /* Emerald 500 - Success */
   --harmony-accent1-soft: #D1FAE5;
   /* Emerald 100 */
+  --harmony-expense-soft: #FFE4E6;
+  /* Rose 100 */
 
   --harmony-accent2: #8B5CF6;
   /* Violet 500 - Special */
@@ -872,6 +1005,249 @@ const getCategoryIcon = (category) => {
 .harmony-gradient-primary {
   background: var(--harmony-gradient-primary) !important;
   color: white;
+}
+
+/* ============================================
+   TRANSACTION TOGGLE SWITCH
+   ============================================ */
+
+.transaction-toggle-wrapper {
+  padding: 0 0 1rem 0;
+}
+
+.transaction-toggle {
+  background: #F1F5F9;
+  border-radius: 16px;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.transaction-toggle:hover {
+  background: #E2E8F0;
+}
+
+.toggle-slider {
+  display: flex;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.toggle-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #64748B;
+}
+
+.toggle-option i {
+  font-size: 1.1rem;
+}
+
+.toggle-option.active {
+  color: white;
+}
+
+.expense-option.active {
+  color: white;
+}
+
+.income-option.active {
+  color: white;
+}
+
+.toggle-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--harmony-expense);
+  border-radius: 12px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+}
+
+.transaction-toggle.income-active .toggle-indicator {
+  transform: translateX(100%);
+  background: var(--harmony-accent1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   TRANSACTION TYPE BADGE
+   ============================================ */
+
+.transaction-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expense-badge {
+  background: var(--harmony-expense-soft);
+  color: var(--harmony-expense);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.income-badge {
+  background: var(--harmony-accent1-soft);
+  color: var(--harmony-accent1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================
+   AMOUNT INPUT WITH +/- INDICATOR
+   ============================================ */
+
+.amount-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 1rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.expense-symbol {
+  color: var(--harmony-expense);
+}
+
+.income-symbol {
+  color: var(--harmony-accent1);
+}
+
+.amount-input {
+  padding-left: 2.5rem !important;
+}
+
+.amount-label {
+  left: 2.5rem !important;
+}
+
+/* ============================================
+   INCOME-SPECIFIC STYLES
+   ============================================ */
+
+.income-input:focus {
+  border-color: var(--harmony-accent1) !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+}
+
+.income-line {
+  background: linear-gradient(90deg, var(--harmony-accent1), var(--harmony-primary)) !important;
+}
+
+/* ============================================
+   BUTTON VARIANTS
+   ============================================ */
+
+.harmony-btn-expense {
+  background: var(--harmony-gradient-primary) !important;
+  border: none !important;
+  color: white !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.harmony-btn-expense:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(13, 148, 136, 0.4) !important;
+}
+
+.harmony-btn-income {
+  background: linear-gradient(135deg, var(--harmony-accent1) 0%, var(--harmony-primary) 100%) !important;
+  border: none !important;
+  color: white !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.harmony-btn-income:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ============================================
+   OPTGROUP STYLING
+   ============================================ */
+
+optgroup {
+  font-weight: 600;
+  color: var(--harmony-primary);
+}
+
+optgroup option {
+  font-weight: 400;
+  padding: 0.5rem;
+}
+
+/* Animation for form card */
+.slide-in-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse animation for icon */
+.pulse-icon {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* ============================================

@@ -23,7 +23,7 @@ const createValidation = [
     .isFloat({ min: 0.01 }).withMessage('Amount must be at least 0.01'),
   body('category')
     .notEmpty().withMessage('Category is required')
-    .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other'])
+    .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Send Transfer', 'Salary', 'Bonus', 'Get Transfer', 'Other'])
     .withMessage('Invalid category'),
   body('expense_date')
     .notEmpty().withMessage('Date is required')
@@ -41,7 +41,7 @@ const updateValidation = [
     .isFloat({ min: 0.01 }).withMessage('Amount must be at least 0.01'),
   body('category')
     .optional()
-    .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other'])
+    .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other', 'Bonus'])
     .withMessage('Invalid category'),
   body('expense_date')
     .optional()

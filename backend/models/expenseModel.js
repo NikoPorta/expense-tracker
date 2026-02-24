@@ -43,12 +43,12 @@ class ExpenseModel {
 
   // Create new expense
   static async create(expenseData) {
-    const { description, amount, category, expense_date } = expenseData;
+    const { description, expense_income, amount, category, expense_date } = expenseData;
     
     const [result] = await pool.execute(
-      `INSERT INTO expenses (description, amount, category, expense_date) 
-       VALUES (?, ?, ?, ?)`,
-      [description, amount, category, expense_date]
+      `INSERT INTO expenses (description, expense_income, amount, category, expense_date) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [description, expense_income, amount, category, expense_date]
     );
 
     return {
