@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Delius';
+    src: url('./fonts/Delius-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    font-family: 'Delius', sans-serif;
+}

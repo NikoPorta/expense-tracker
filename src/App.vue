@@ -15,7 +15,7 @@
             <div class="card glass-card header-card" :class="{ 'animate-in': mounted }">
               <div class="card-body text-center py-5 position-relative overflow-hidden">
                 <div class="shimmer-effect"></div>
-                <h1 class="display-4 fw-bold mb-3 harmony-text-primary">
+                <h1 class="display-4 fw-bold mb-3">
                   <i class="bi bi-wallet2 me-3 bounce-icon"></i>
                   <span class="typewriter-text">{{ headerText }}</span>
                   <span class="cursor-blink">|</span>
