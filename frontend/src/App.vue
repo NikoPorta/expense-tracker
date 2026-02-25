@@ -46,7 +46,12 @@
                 </div>
                 <h5 class="card-title harmony-text-muted mb-2">{{ card.title }}</h5>
                 <h2 class="fw-bold counter-text" :class="`harmony-text-${card.harmonyColor}`">
-                  <span class="counter" :data-target="card.value">$0.00</span>
+                  <div v-if="card.title === 'Transactions'">
+                    <span class="counter-transactions" :data-target="card.value">$0.00</span>
+                  </div>
+                  <div v-else>
+                    <span class="counter" :data-target="card.value">$0.00</span>
+                  </div>
                 </h2>
                 <div class="trend-indicator" v-if="card.trend" :class="`harmony-text-${card.trendColor}`">
                   <i :class="`bi ${card.trendIcon} me-1`"></i>
@@ -226,7 +231,7 @@
                         <div class="flex-grow-1 ms-3">
                           <div class="d-flex justify-content-between mb-1">
                             <span class="fw-semibold harmony-text-dark">{{ category }}</span>
-                            <span class="fw-bold harmony-text-primary">${{ amount }}</span>
+                            <span class="fw-bold harmony-text-primary">{{ formatCurrency(amount) }}</span>
                           </div>
                           <div class="progress progress-animated" style="height: 8px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated harmony-progress"
@@ -300,10 +305,10 @@
                           <td class="fw-bold"
                             :class="expense.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
                             <span v-if="expense.expense_income === 'Income'" class="amount-value income-amount">
-                              +${{ expense.amount }}
+                              +{{ formatCurrency(expense.amount) }}
                             </span>
                             <span v-else class="amount-value">
-                              -${{ expense.amount }}
+                              -{{ formatCurrency(expense.amount) }}
                             </span>
                           </td>
                           <td class="text-center">
@@ -426,42 +431,6 @@ const toggleTransactionType = () => {
   newTransaction.value.category = '' // Reset category when switching
 }
 
-// Add transaction
-const addTransaction = async () => {
-  isSubmitting.value = true
-
-  await new Promise(resolve => setTimeout(resolve, 600))
-
-  const transaction = {
-    ...newTransaction.value,
-    expense_income: transactionType.value === 'expense'
-      ? "Expense"
-      : "Income"
-  }
-
-  // Add to your expenses array (replace with API call)
-  console.log('Adding transaction:', transaction)
-  const created = await api.createExpense(transaction)
-  triggerConfetti()
-  expenses.value.push(created?.data || transaction)
-
-  // Reset form
-  newTransaction.value = {
-    description: '',
-    amount: '',
-    category: '',
-    expense_date: new Date().toISOString().split('T')[0],
-    expense_income: transactionType.value
-  }
-
-  nextTick(() => {
-    animateCounters()
-    animateProgressBars()
-  })
-
-  isSubmitting.value = false
-}
-
 onMounted(async () => {
   try {
     const fetchExpenses = await api.getExpenses();
@@ -501,13 +470,40 @@ const animateCounters = () => {
       const increment = target / (duration / 16)
       let current = 0
 
+      const formatNumber = (num) => {
+        if (num >= 1000000) {
+          return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt'
+        } else if (num >= 1000) {
+          return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+        }
+        return num.toFixed(0)
+      }
+
       const updateCounter = () => {
         current += increment
         if (current < target) {
-          counter.textContent = '$' + current.toFixed(2)
+          counter.textContent = 'Rp ' + formatNumber(current)
           requestAnimationFrame(updateCounter)
         } else {
-          counter.textContent = '$' + target.toFixed(2)
+          counter.textContent = 'Rp ' + formatNumber(target)
+        }
+      }
+
+      updateCounter()
+    })
+    document.querySelectorAll('.counter-transactions').forEach(counter => {
+      const target = parseFloat(counter.getAttribute('data-target')) || 0
+      const duration = 2000
+      const increment = target / (duration / 16)
+      let current = 0
+
+      const updateCounter = () => {
+        current += increment
+        if (current < target) {
+          counter.textContent = current.toFixed(0)
+          requestAnimationFrame(updateCounter)
+        } else {
+          counter.textContent = target.toFixed(0)
         }
       }
       updateCounter()
@@ -550,6 +546,59 @@ const totalExpenses = computed(() => {
 })
 
 const totalBalance = computed(() => totalIncome.value - totalExpenses.value)
+const trendBalance = computed(() => {
+  const lastMonthExpenses = expenses.value
+    .filter(e => {
+      const date = new Date(e.expense_date || e.date)
+      const now = new Date()
+      return date.getMonth() === now.getMonth() - 1 && ['Expense'].includes(e.expense_income)
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+  const lastMonthIncome = expenses.value
+    .filter(e => {
+      const date = new Date(e.expense_date || e.date)
+      const now = new Date()
+      return date.getMonth() === now.getMonth() - 1 && ['Income'].includes(e.expense_income)
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+  const lastMonthBalance = lastMonthIncome - lastMonthExpenses
+
+  if (lastMonthBalance - totalBalance.value === 0) return '0'
+
+  const change = ((totalBalance.value - lastMonthBalance) / lastMonthBalance) * 100
+  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
+})
+const trendExpenses = computed(() => {
+  const currentWeekExpenses = expenses.value
+    .filter(e => {
+      const date = new Date(e.expense_date || e.date)
+      const now = new Date()
+      const oneWeekAgo = new Date(now.setDate(now.getDate() - 7))
+      return date >= oneWeekAgo && ['Expense'].includes(e.expense_income)
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+  const now = new Date()
+  const oneWeekAgo = new Date(now)
+  oneWeekAgo.setDate(now.getDate() - 7)
+
+  const twoWeekAgo = new Date(now)
+  twoWeekAgo.setDate(now.getDate() - 14)
+
+  const lastWeekExpenses = expenses.value.filter(e => {
+    const date = new Date(e.expense_date)
+    return (
+      date >= twoWeekAgo &&
+      date < oneWeekAgo &&
+      e.expense_income === 'Expense'
+    )
+  })
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+
+  if (currentWeekExpenses - lastWeekExpenses === 0) return '0'
+
+  const change = ((currentWeekExpenses - lastWeekExpenses) / lastWeekExpenses) * 100
+  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
+})
 
 const categoryTotals = computed(() => {
   const totals = {}
@@ -566,8 +615,8 @@ const summaryCards = computed(() => [
     value: totalBalance.value,
     harmonyColor: 'accent1',
     icon: 'bi-wallet',
-    trend: '+12% this month',
-    trendIcon: 'bi-arrow-up',
+    trend: trendBalance.value + '% vs last month',
+    trendIcon: trendBalance.value >= 0 ? 'bi-arrow-up' : 'bi-arrow-down',
     trendColor: 'accent1'
   },
   {
@@ -576,8 +625,8 @@ const summaryCards = computed(() => [
     value: totalExpenses.value,
     harmonyColor: 'expense',
     icon: 'bi-graph-down-arrow',
-    trend: '-5% vs last week',
-    trendIcon: 'bi-arrow-down',
+    trend: trendExpenses.value + '% vs last week',
+    trendIcon: trendExpenses.value >= 0 ? 'bi-arrow-up' : 'bi-arrow-down',
     trendColor: 'expense'
   },
   {
@@ -592,34 +641,49 @@ const summaryCards = computed(() => [
   }
 ])
 
-const addExpense = async () => {
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 2
+  }).format(amount)
+}
+
+// Add transaction
+const addTransaction = async () => {
   isSubmitting.value = true
+
   await new Promise(resolve => setTimeout(resolve, 600))
 
-  const expense = {
-    id: Date.now(),
-    ...newExpense.value,
-    timestamp: Date.now()
+  const transaction = {
+    ...newTransaction.value,
+    expense_income: transactionType.value === 'expense'
+      ? "Expense"
+      : "Income"
   }
 
-  expenses.value.push(expense)
-  saveExpenses()
+  // Add to your expenses array (replace with API call)
+  console.log('Adding transaction:', transaction)
+  const created = await api.createExpense(transaction)
+  showToast('Expense added successfully!', 'success', 'bi-check-circle')
+  triggerConfetti()
+  expenses.value.push(created?.data || transaction)
 
-  newExpense.value = {
+  // Reset form
+  newTransaction.value = {
     description: '',
     amount: '',
     category: '',
-    date: new Date().toISOString().split('T')[0]
+    expense_date: new Date().toISOString().split('T')[0],
+    expense_income: transactionType.value
   }
-
-  isSubmitting.value = false
-  showToast('Expense added successfully!', 'success', 'bi-check-circle')
-  triggerConfetti()
 
   nextTick(() => {
     animateCounters()
     animateProgressBars()
   })
+
+  isSubmitting.value = false
 }
 
 const deleteExpense = async (id) => {
@@ -1569,8 +1633,7 @@ optgroup option {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
-  opacity: 0;
+  opacity: 1;
   transform: scale(0.8);
 }
 
