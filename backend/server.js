@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { testConnection } = require('./config/database');
 const expenseRoutes = require('./routes/expenseRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 // Load environment variables
@@ -41,6 +42,7 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/auth', authRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -50,6 +52,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       expenses: '/api/expenses',
+      auth: '/api/auth',
       summary: '/api/expenses/summary',
       categories: '/api/expenses/categories',
       health: '/api/health'

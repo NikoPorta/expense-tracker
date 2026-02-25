@@ -1,5 +1,68 @@
 <template>
-  <div class="app-container">
+  <div v-if="isAuthLoading" class="auth-loading-screen">
+    <div class="auth-loading-card">
+      <div class="spinner-border text-light mb-3" role="status"></div>
+      <p class="mb-0">Loading authentication...</p>
+    </div>
+  </div>
+
+  <div v-else-if="!currentUser" class="auth-page">
+    <div class="auth-bg">
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+    </div>
+
+    <div class="auth-card">
+      <h2 class="fw-bold mb-2">{{ authMode === 'login' ? 'Welcome back' : 'Create account' }}</h2>
+      <p class="text-muted mb-4">
+        {{ authMode === 'login' ? 'Sign in to manage your expenses.' : 'Register and start tracking your finances.' }}
+      </p>
+
+      <div class="d-flex auth-switch mb-4">
+        <button class="btn flex-fill" :class="authMode === 'login' ? 'btn-primary' : 'btn-outline-primary'" @click="authMode = 'login'">
+          Login
+        </button>
+        <button class="btn flex-fill" :class="authMode === 'register' ? 'btn-primary' : 'btn-outline-primary'" @click="authMode = 'register'">
+          Register
+        </button>
+      </div>
+
+      <form @submit.prevent="handleAuthSubmit">
+        <div class="mb-3" v-if="authMode === 'register'">
+          <label class="form-label">Name</label>
+          <input v-model.trim="authForm.name" type="text" class="form-control" placeholder="Your name" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input v-model.trim="authForm.email" type="email" class="form-control" placeholder="you@example.com" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input v-model="authForm.password" type="password" class="form-control" placeholder="Minimum 6 characters" required />
+        </div>
+
+        <div class="mb-3" v-if="authMode === 'register'">
+          <label class="form-label">Confirm password</label>
+          <input v-model="authForm.confirmPassword" type="password" class="form-control" placeholder="Repeat password" required />
+        </div>
+
+        <div v-if="authError" class="alert alert-danger py-2">{{ authError }}</div>
+
+        <button type="submit" class="btn btn-primary w-100" :disabled="isAuthSubmitting">
+          <span v-if="!isAuthSubmitting">{{ authMode === 'login' ? 'Login' : 'Register' }}</span>
+          <span v-else class="spinner-border spinner-border-sm"></span>
+        </button>
+      </form>
+
+      <small class="d-block mt-3 text-muted">
+        Auth mode: <strong>{{ isProduction ? 'Firebase (production)' : 'Local storage (development)' }}</strong>
+      </small>
+    </div>
+  </div>
+
+  <div v-else class="app-container">
     <!-- Animated Background with Harmony Gradients -->
     <div class="animated-bg">
       <div class="gradient-orb orb-1"></div>
@@ -14,6 +77,10 @@
           <div class="col-12">
             <div class="card glass-card header-card" :class="{ 'animate-in': mounted }">
               <div class="card-body text-center py-5 position-relative overflow-hidden">
+                <div class="auth-user-actions">
+                  <span class="badge text-bg-light">{{ currentUser.name || currentUser.email }}</span>
+                  <button class="btn btn-sm btn-light ms-2" @click="handleLogout">Logout</button>
+                </div>
                 <div class="shimmer-effect"></div>
                 <h1 class="display-4 fw-bold mb-3">
                   <i class="bi bi-wallet2 me-3 bounce-icon"></i>
@@ -361,8 +428,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import api from './services/api'
+import AuthService from './services/auth'
 
 const mounted = ref(false)
 const isSubmitting = ref(false)
@@ -374,6 +442,19 @@ const toasts = ref([])
 const confettiCanvas = ref(null)
 const filter = ref('all')
 const validationErrors = ref({})
+const isProduction = AuthService.isProduction()
+const isAuthLoading = ref(true)
+const isAuthSubmitting = ref(false)
+const currentUser = ref(null)
+const authMode = ref('login')
+const authError = ref('')
+const authForm = ref({
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: ''
+})
+let unsubscribeAuth = null
 
 // Harmony Color Palette
 // Primary: Teal (#0D9488) - Main brand color
@@ -431,23 +512,121 @@ const toggleTransactionType = () => {
   newTransaction.value.category = '' // Reset category when switching
 }
 
-onMounted(async () => {
+const resetTrackerState = () => {
+  mounted.value = false
+  headerText.value = ''
+  expenses.value = []
+  toasts.value = []
+}
+
+const initializeTracker = async () => {
   try {
-    const fetchExpenses = await api.getExpenses();
-    expenses.value = fetchExpenses.data;
+    const fetchExpenses = await api.getExpenses()
+    expenses.value = fetchExpenses.data || []
   } catch (error) {
     if (error?.code === 'permission-denied' || String(error?.message || '').includes('Missing or insufficient permissions')) {
       showToast('Firebase permission denied. Update Firestore rules for expenses collection.', 'danger', 'bi-shield-exclamation')
     }
-    console.error('Failed to fetch expenses:', error);
+    console.error('Failed to fetch expenses:', error)
   }
 
   setTimeout(() => {
     mounted.value = true
-    typeWriter()
+    if (!headerText.value) typeWriter()
     animateCounters()
     animateProgressBars()
   }, 100)
+}
+
+const mapAuthError = (error) => {
+  const message = String(error?.message || 'Authentication failed')
+  if (message.includes('auth/email-already-in-use')) return 'Email already exists.'
+  if (message.includes('auth/invalid-credential')) return 'Invalid email or password.'
+  if (message.includes('auth/invalid-email')) return 'Invalid email format.'
+  if (message.includes('auth/weak-password')) return 'Password should be at least 6 characters.'
+  return message
+}
+
+const handleAuthSubmit = async () => {
+  authError.value = ''
+
+  if (!authForm.value.email || !authForm.value.password) {
+    authError.value = 'Email and password are required.'
+    return
+  }
+
+  if (authMode.value === 'register') {
+    if (authForm.value.password.length < 6) {
+      authError.value = 'Password should be at least 6 characters.'
+      return
+    }
+    if (authForm.value.password !== authForm.value.confirmPassword) {
+      authError.value = 'Passwords do not match.'
+      return
+    }
+  }
+
+  isAuthSubmitting.value = true
+
+  try {
+    if (authMode.value === 'login') {
+      const user = await AuthService.login({
+        email: authForm.value.email,
+        password: authForm.value.password
+      })
+      if (!isProduction) {
+        currentUser.value = user
+        await initializeTracker()
+      }
+    } else {
+      const user = await AuthService.register({
+        name: authForm.value.name,
+        email: authForm.value.email,
+        password: authForm.value.password
+      })
+      if (!isProduction) {
+        currentUser.value = user
+        await initializeTracker()
+      }
+    }
+
+    authForm.value = {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
+  } catch (error) {
+    authError.value = mapAuthError(error)
+  } finally {
+    isAuthSubmitting.value = false
+  }
+}
+
+const handleLogout = async () => {
+  await AuthService.logout()
+  if (!isProduction) {
+    currentUser.value = null
+    resetTrackerState()
+  }
+}
+
+onMounted(() => {
+  unsubscribeAuth = AuthService.onAuthStateChange(async (user) => {
+    currentUser.value = user
+    if (user) {
+      await initializeTracker()
+    } else {
+      resetTrackerState()
+    }
+    isAuthLoading.value = false
+  })
+})
+
+onUnmounted(() => {
+  if (typeof unsubscribeAuth === 'function') {
+    unsubscribeAuth()
+  }
 })
 
 const typeWriter = () => {
@@ -564,6 +743,7 @@ const trendBalance = computed(() => {
   const lastMonthBalance = lastMonthIncome - lastMonthExpenses
 
   if (lastMonthBalance - totalBalance.value === 0) return '0'
+  if (lastMonthBalance === 0 && totalBalance.value > 0) return '+100' // If last month balance is 0, we consider it a 100% increase if current balance is positive
 
   const change = ((totalBalance.value - lastMonthBalance) / lastMonthBalance) * 100
   return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
@@ -595,6 +775,7 @@ const trendExpenses = computed(() => {
     .reduce((sum, e) => sum + parseFloat(e.amount), 0)
 
   if (currentWeekExpenses - lastWeekExpenses === 0) return '0'
+  if (lastWeekExpenses === 0 && currentWeekExpenses > 0) return '+100' // If last week expenses is 0, we consider it a 100% increase if current expenses is positive)
 
   const change = ((currentWeekExpenses - lastWeekExpenses) / lastWeekExpenses) * 100
   return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
@@ -896,11 +1077,80 @@ const getCategoryIcon = (category) => {
    BASE STYLES
    ============================================ */
 
+.auth-loading-screen,
+.auth-page {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #0f172a 0%, #155e75 55%, #0f766e 100%);
+  overflow: hidden;
+}
+
+.auth-loading-card {
+  color: white;
+  text-align: center;
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.auth-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.auth-orb-1 {
+  width: 320px;
+  height: 320px;
+  background: #0ea5e9;
+  top: -80px;
+  left: -60px;
+}
+
+.auth-orb-2 {
+  width: 280px;
+  height: 280px;
+  background: #14b8a6;
+  right: -60px;
+  bottom: -60px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  z-index: 1;
+  background: white;
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px rgba(2, 6, 23, 0.3);
+}
+
+.auth-switch {
+  gap: 0.5rem;
+}
+
 .app-container {
   min-height: 100vh;
   position: relative;
   background: var(--harmony-bg);
   overflow-x: hidden;
+}
+
+.auth-user-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
 }
 
 /* Animated Background with Harmony Colors */
