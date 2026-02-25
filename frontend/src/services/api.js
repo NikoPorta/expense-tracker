@@ -1,13 +1,13 @@
 // services/api.js
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT || import.meta.env.ENVIRONMENT || 'development';
 const IS_PRODUCTION = ENVIRONMENT === 'production';
-const EXPENSES_COLLECTION = 'expenses';
+const TRANSACTIONS_COLLECTION = 'transactions';
 
-class ExpenseAPI {
+class TransactionAPI {
   static async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
 
@@ -38,7 +38,7 @@ class ExpenseAPI {
     }
   }
 
-  static async getExpenses(filters = {}) {
+  static async getTransactions(filters = {}) {
     if (!IS_PRODUCTION) {
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
@@ -46,10 +46,10 @@ class ExpenseAPI {
       });
 
       const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
-      return this.request(`/expenses${query}`);
+      return this.request(`/transactions${query}`);
     }
 
-    const snapshot = await getDocs(collection(db, EXPENSES_COLLECTION));
+    const snapshot = await getDocs(collection(db, TRANSACTIONS_COLLECTION));
     let data = snapshot.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() }));
 
     if (filters && Object.keys(filters).length > 0) {
@@ -59,64 +59,77 @@ class ExpenseAPI {
     return { data };
   }
 
-  static async getExpense(id) {
+  static async getTransaction(id) {
     if (!IS_PRODUCTION) {
-      return this.request(`/expenses/${id}`);
+      return this.request(`/transactions/${id}`);
     }
 
-    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
+    const docRef = doc(db, TRANSACTIONS_COLLECTION, String(id));
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) {
-      throw new Error('Expense not found');
+      throw new Error('Transaction not found');
     }
 
     return { data: { id: snapshot.id, ...snapshot.data() } };
   }
 
-  static async createExpense(expenseData) {
-    if (!IS_PRODUCTION) {
-      return this.request('/expenses', {
-        method: 'POST',
-        body: expenseData
-      });
-    }
-
-    const docRef = await addDoc(collection(db, EXPENSES_COLLECTION), expenseData);
-    return { data: { id: docRef.id, ...expenseData } };
+  static async createTransaction(transactionData) {
+  if (!IS_PRODUCTION) {
+    const localStorageCredential = localStorage.getItem('expense_tracker_local_session');
+    const uid = localStorageCredential ? JSON.parse(localStorageCredential).name : 'Anonymous';
+    return this.request('/transactions', {
+      method: 'POST',
+      body: {
+        ...transactionData,
+        created_by: uid
+      }
+    });
   }
 
-  static async updateExpense(id, expenseData) {
+  const uid = auth.currentUser?.uid || 'Anonymous';
+  const docRef = await addDoc(
+    collection(db, TRANSACTIONS_COLLECTION),
+    {
+      ...transactionData,
+      created_by: uid
+    }
+  );
+
+  return { data: { id: docRef.id, ...transactionData } };
+}
+
+  static async updateTransaction(id, transactionData) {
     if (!IS_PRODUCTION) {
-      return this.request(`/expenses/${id}`, {
+      return this.request(`/transactions/${id}`, {
         method: 'PUT',
-        body: expenseData
+        body: transactionData
       });
     }
 
-    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
-    await updateDoc(docRef, expenseData);
-    return { data: { id, ...expenseData } };
+    const docRef = doc(db, TRANSACTIONS_COLLECTION, String(id));
+    await updateDoc(docRef, transactionData);
+    return { data: { id, ...transactionData } };
   }
 
-  static async deleteExpense(id) {
+  static async deleteTransaction(id) {
     if (!IS_PRODUCTION) {
-      return this.request(`/expenses/${id}`, {
+      return this.request(`/transactions/${id}`, {
         method: 'DELETE'
       });
     }
 
-    const docRef = doc(db, EXPENSES_COLLECTION, String(id));
+    const docRef = doc(db, TRANSACTIONS_COLLECTION, String(id));
     await deleteDoc(docRef);
     return { data: { id } };
   }
 
   static async getSummary() {
     if (!IS_PRODUCTION) {
-      return this.request('/expenses/summary');
+      return this.request('/transactions/summary');
     }
 
-    const { data } = await this.getExpenses();
+    const { data } = await this.getTransactions();
     const summary = data.reduce(
       (acc, item) => {
         const amount = Number(item.amount || 0);
@@ -132,10 +145,10 @@ class ExpenseAPI {
 
   static async getCategories() {
     if (!IS_PRODUCTION) {
-      return this.request('/expenses/categories');
+      return this.request('/transactions/categories');
     }
 
-    const { data } = await this.getExpenses();
+    const { data } = await this.getTransactions();
     const categories = data.reduce((acc, item) => {
       const amount = Number(item.amount || 0);
       acc[item.category] = (acc[item.category] || 0) + amount;
@@ -146,4 +159,4 @@ class ExpenseAPI {
   }
 }
 
-export default ExpenseAPI;
+export default TransactionAPI;

@@ -19,10 +19,12 @@
       </p>
 
       <div class="d-flex auth-switch mb-4">
-        <button class="btn flex-fill" :class="authMode === 'login' ? 'btn-primary' : 'btn-outline-primary'" @click="authMode = 'login'">
+        <button class="btn flex-fill" :class="authMode === 'login' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="authMode = 'login'">
           Login
         </button>
-        <button class="btn flex-fill" :class="authMode === 'register' ? 'btn-primary' : 'btn-outline-primary'" @click="authMode = 'register'">
+        <button class="btn flex-fill" :class="authMode === 'register' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="authMode = 'register'">
           Register
         </button>
       </div>
@@ -35,17 +37,20 @@
 
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input v-model.trim="authForm.email" type="email" class="form-control" placeholder="you@example.com" required />
+          <input v-model.trim="authForm.email" type="email" class="form-control" placeholder="you@example.com"
+            required />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Password</label>
-          <input v-model="authForm.password" type="password" class="form-control" placeholder="Minimum 6 characters" required />
+          <input v-model="authForm.password" type="password" class="form-control" placeholder="Minimum 6 characters"
+            required />
         </div>
 
         <div class="mb-3" v-if="authMode === 'register'">
           <label class="form-label">Confirm password</label>
-          <input v-model="authForm.confirmPassword" type="password" class="form-control" placeholder="Repeat password" required />
+          <input v-model="authForm.confirmPassword" type="password" class="form-control" placeholder="Repeat password"
+            required />
         </div>
 
         <div v-if="authError" class="alert alert-danger py-2">{{ authError }}</div>
@@ -243,7 +248,7 @@
                   </div>
 
                   <div class="form-floating mb-4 input-group-animated">
-                    <input v-model="newTransaction.expense_date" type="date" class="form-control harmony-input"
+                    <input v-model="newTransaction.transaction_date" type="date" class="form-control harmony-input"
                       :class="{ 'income-input': transactionType === 'income' }" id="dateInput" required
                       @focus="activeField = 'date'" @blur="activeField = null">
                     <label for="dateInput" class="harmony-label">
@@ -303,7 +308,7 @@
                           <div class="progress progress-animated" style="height: 8px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated harmony-progress"
                               :class="`harmony-bg-${getHarmonyColor(category)}`" :style="{ width: '0%' }"
-                              :data-width="(amount / totalExpenses * 100) + '%'"></div>
+                              :data-width="(amount / totalTransactions * 100) + '%'"></div>
                           </div>
                         </div>
                       </div>
@@ -348,45 +353,45 @@
                     </thead>
                     <tbody>
                       <transition-group name="list">
-                        <tr v-for="(expense, index) in filteredExpenses" :key="expense.id"
+                        <tr v-for="(transaction, index) in filteredTransactions" :key="transaction.id"
                           class="align-middle transaction-row" :style="{ animationDelay: `${index * 0.05}s` }">
                           <td class="ps-4">
                             <div class="d-flex align-items-center">
                               <div class="date-badge harmony-gradient-primary me-2">
-                                <span class="day">{{ formatDay(expense.expense_date) }}</span>
-                                <span class="month">{{ formatMonth(expense.expense_date) }}</span>
+                                <span class="day">{{ formatDay(transaction.transaction_date) }}</span>
+                                <span class="month">{{ formatMonth(transaction.transaction_date) }}</span>
                               </div>
                             </div>
                           </td>
                           <td>
-                            <div class="fw-semibold harmony-text-dark">{{ expense.description }}</div>
-                            <small class="harmony-text-muted">{{ formatTime(expense.expense_date) }}</small>
+                            <div class="fw-semibold harmony-text-dark">{{ transaction.description }}</div>
+                            <small class="harmony-text-muted">{{ formatTime(transaction.transaction_date) }}</small>
                           </td>
                           <td>
                             <span class="badge category-badge harmony-badge"
-                              :class="`harmony-bg-${getHarmonyColor(expense.category)}`">
-                              <i :class="`bi ${getCategoryIcon(expense.category)} me-1`"></i>
-                              {{ expense.category }}
+                              :class="`harmony-bg-${getHarmonyColor(transaction.category)}`">
+                              <i :class="`bi ${getCategoryIcon(transaction.category)} me-1`"></i>
+                              {{ transaction.category }}
                             </span>
                           </td>
                           <td class="fw-bold"
-                            :class="expense.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
-                            <span v-if="expense.expense_income === 'Income'" class="amount-value income-amount">
-                              +{{ formatCurrency(expense.amount) }}
+                            :class="transaction.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
+                            <span v-if="transaction.expense_income === 'Income'" class="amount-value income-amount">
+                              +{{ formatCurrency(transaction.amount) }}
                             </span>
                             <span v-else class="amount-value">
-                              -{{ formatCurrency(expense.amount) }}
+                              -{{ formatCurrency(transaction.amount) }}
                             </span>
                           </td>
                           <td class="text-center">
-                            <button @click="deleteExpense(expense.id)" class="btn btn-delete harmony-btn-delete btn-sm"
-                              title="Delete">
+                            <button @click="deleteTransaction(transaction.id)"
+                              class="btn btn-delete harmony-btn-delete btn-sm" title="Delete">
                               <i class="bi bi-x-lg"></i>
                             </button>
                           </td>
                         </tr>
                       </transition-group>
-                      <tr v-if="filteredExpenses.length === 0">
+                      <tr v-if="filteredTransactions.length === 0">
                         <td colspan="5" class="text-center py-5 empty-state">
                           <div class="empty-animation">
                             <i class="bi bi-inbox fs-1 mb-3 d-block harmony-text-muted"></i>
@@ -478,30 +483,13 @@ const harmonyColors = {
   'Get Transfer': 'accent1'
 }
 
-const sampleExpenses = [
-  { id: 1, description: 'Weekly Groceries', amount: 156.43, category: 'Food', date: '2024-01-15', timestamp: Date.now() - 86400000 },
-  { id: 2, description: 'Uber Ride to Airport', amount: 24.50, category: 'Transport', date: '2024-01-14', timestamp: Date.now() - 172800000 },
-  { id: 3, description: 'Netflix Subscription', amount: 15.99, category: 'Entertainment', date: '2024-01-13', timestamp: Date.now() - 259200000 },
-  { id: 4, description: 'Electric Bill', amount: 89.00, category: 'Bills', date: '2024-01-12', timestamp: Date.now() - 345600000 },
-  { id: 5, description: 'Nike Air Max', amount: 120.00, category: 'Shopping', date: '2024-01-11', timestamp: Date.now() - 432000000 },
-  { id: 6, description: 'Pharmacy - Vitamins', amount: 45.67, category: 'Health', date: '2024-01-10', timestamp: Date.now() - 518400000 },
-  { id: 7, description: 'Team Lunch', amount: 68.50, category: 'Food', date: '2024-01-09', timestamp: Date.now() - 604800000 },
-  { id: 8, description: 'Gas Station Shell', amount: 55.00, category: 'Transport', date: '2024-01-08', timestamp: Date.now() - 691200000 }
-]
-
-const expenses = ref([])
-const newExpense = ref({
-  description: '',
-  amount: '',
-  category: '',
-  date: new Date().toISOString().split('T')[0]
-})
+const transactions = ref([])
 
 const newTransaction = ref({
   description: '',
   amount: '',
   category: '',
-  expense_date: new Date().toISOString().split('T')[0],
+  transaction_date: new Date().toISOString().split('T')[0],
   expense_income: 'expense'
 })
 
@@ -515,14 +503,14 @@ const toggleTransactionType = () => {
 const resetTrackerState = () => {
   mounted.value = false
   headerText.value = ''
-  expenses.value = []
+  transactions.value = []
   toasts.value = []
 }
 
 const initializeTracker = async () => {
   try {
-    const fetchExpenses = await api.getExpenses()
-    expenses.value = fetchExpenses.data || []
+    const fetchTransactions = await api.getTransactions()
+    transactions.value = fetchTransactions.data || []
   } catch (error) {
     if (error?.code === 'permission-denied' || String(error?.message || '').includes('Missing or insufficient permissions')) {
       showToast('Firebase permission denied. Update Firestore rules for expenses collection.', 'danger', 'bi-shield-exclamation')
@@ -701,41 +689,41 @@ const animateProgressBars = () => {
   })
 }
 
-const sortedExpenses = computed(() => {
-  return [...expenses.value].sort(
-    (a, b) => new Date(b.expense_date || b.date) - new Date(a.expense_date || a.date)
+const sortedTransactions = computed(() => {
+  return [...transactions.value].sort(
+    (a, b) => new Date(b.transaction_date || b.date) - new Date(a.transaction_date || a.date)
   )
 })
 
-const filteredExpenses = computed(() => {
-  if (filter.value === 'all') return sortedExpenses.value
-  return sortedExpenses.value.filter(e => e.category === filter.value)
+const filteredTransactions = computed(() => {
+  if (filter.value === 'all') return sortedTransactions.value
+  return sortedTransactions.value.filter(e => e.category === filter.value)
 })
 
 const totalIncome = computed(() => {
-  return expenses.value
+  return transactions.value
     .filter(e => ['Income'].includes(e.expense_income))
     .reduce((sum, e) => sum + parseFloat(e.amount), 0)
 })
 
-const totalExpenses = computed(() => {
-  return expenses.value
+const totalTransactions = computed(() => {
+  return transactions.value
     .filter(e => ['Expense'].includes(e.expense_income))
     .reduce((sum, e) => sum + parseFloat(e.amount), 0)
 })
 
-const totalBalance = computed(() => totalIncome.value - totalExpenses.value)
+const totalBalance = computed(() => totalIncome.value - totalTransactions.value)
 const trendBalance = computed(() => {
-  const lastMonthExpenses = expenses.value
+  const lastMonthExpenses = transactions.value
     .filter(e => {
-      const date = new Date(e.expense_date || e.date)
+      const date = new Date(e.transaction_date || e.date)
       const now = new Date()
       return date.getMonth() === now.getMonth() - 1 && ['Expense'].includes(e.expense_income)
     })
     .reduce((sum, e) => sum + parseFloat(e.amount), 0)
-  const lastMonthIncome = expenses.value
+  const lastMonthIncome = transactions.value
     .filter(e => {
-      const date = new Date(e.expense_date || e.date)
+      const date = new Date(e.transaction_date || e.date)
       const now = new Date()
       return date.getMonth() === now.getMonth() - 1 && ['Income'].includes(e.expense_income)
     })
@@ -749,9 +737,9 @@ const trendBalance = computed(() => {
   return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
 })
 const trendExpenses = computed(() => {
-  const currentWeekExpenses = expenses.value
+  const currentWeekExpenses = transactions.value
     .filter(e => {
-      const date = new Date(e.expense_date || e.date)
+      const date = new Date(e.transaction_date || e.date)
       const now = new Date()
       const oneWeekAgo = new Date(now.setDate(now.getDate() - 7))
       return date >= oneWeekAgo && ['Expense'].includes(e.expense_income)
@@ -764,8 +752,8 @@ const trendExpenses = computed(() => {
   const twoWeekAgo = new Date(now)
   twoWeekAgo.setDate(now.getDate() - 14)
 
-  const lastWeekExpenses = expenses.value.filter(e => {
-    const date = new Date(e.expense_date)
+  const lastWeekExpenses = transactions.value.filter(e => {
+    const date = new Date(e.transaction_date)
     return (
       date >= twoWeekAgo &&
       date < oneWeekAgo &&
@@ -783,7 +771,7 @@ const trendExpenses = computed(() => {
 
 const categoryTotals = computed(() => {
   const totals = {}
-  expenses.value.forEach(e => {
+  transactions.value.forEach(e => {
     totals[e.category] = (totals[e.category] || 0) + parseFloat(e.amount);
   })
   return totals
@@ -803,7 +791,7 @@ const summaryCards = computed(() => [
   {
     type: 'expenses',
     title: 'Total Expenses',
-    value: totalExpenses.value,
+    value: totalTransactions.value,
     harmonyColor: 'expense',
     icon: 'bi-graph-down-arrow',
     trend: trendExpenses.value + '% vs last week',
@@ -813,7 +801,7 @@ const summaryCards = computed(() => [
   {
     type: 'transactions',
     title: 'Transactions',
-    value: expenses.value.length,
+    value: transactions.value.length,
     harmonyColor: 'secondary',
     icon: 'bi-receipt',
     trend: null,
@@ -844,18 +832,17 @@ const addTransaction = async () => {
   }
 
   // Add to your expenses array (replace with API call)
-  console.log('Adding transaction:', transaction)
-  const created = await api.createExpense(transaction)
+  const created = await api.createTransaction(transaction)
   showToast('Expense added successfully!', 'success', 'bi-check-circle')
   triggerConfetti()
-  expenses.value.push(created?.data || transaction)
+  transactions.value.push(created?.data || transaction)
 
   // Reset form
   newTransaction.value = {
     description: '',
     amount: '',
     category: '',
-    expense_date: new Date().toISOString().split('T')[0],
+    transaction_date: new Date().toISOString().split('T')[0],
     expense_income: transactionType.value
   }
 
@@ -867,23 +854,23 @@ const addTransaction = async () => {
   isSubmitting.value = false
 }
 
-const deleteExpense = async (id) => {
-  await api.deleteExpense(id)
-  expenses.value = expenses.value.filter(e => e.id !== id)
+const deleteTransaction = async (id) => {
+  await api.deleteTransaction(id)
+  transactions.value = transactions.value.filter(e => e.id !== id)
   showToast('Expense deleted', 'danger', 'bi-trash')
   animateCounters()
 }
 
 const confirmClear = () => {
   if (confirm('Are you sure you want to clear all expenses?')) {
-    expenses.value = []
+    transactions.value = []
     saveExpenses()
     showToast('All expenses cleared', 'warning', 'bi-exclamation-triangle')
   }
 }
 
 const exportData = () => {
-  const dataStr = JSON.stringify(expenses.value, null, 2)
+  const dataStr = JSON.stringify(transactions.value, null, 2)
   const blob = new Blob([dataStr], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -894,7 +881,7 @@ const exportData = () => {
 }
 
 const saveExpenses = () => {
-  localStorage.setItem('expenses', JSON.stringify(expenses.value))
+  localStorage.setItem('expenses', JSON.stringify(transactions.value))
 }
 
 const showToast = (message, type, icon) => {

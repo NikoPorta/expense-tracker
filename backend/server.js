@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { testConnection } = require('./config/database');
-const expenseRoutes = require('./routes/expenseRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 const authRoutes = require('./routes/authRoutes');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 
@@ -41,7 +41,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/expenses', expenseRoutes);
+app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 
 // Root endpoint
@@ -51,10 +51,10 @@ app.get('/', (req, res) => {
     message: 'Expense Tracker API',
     version: '1.0.0',
     endpoints: {
-      expenses: '/api/expenses',
+      transactions: '/api/transactions',
       auth: '/api/auth',
-      summary: '/api/expenses/summary',
-      categories: '/api/expenses/categories',
+      summary: '/api/transactions/summary',
+      categories: '/api/transactions/categories',
       health: '/api/health'
     }
   });
