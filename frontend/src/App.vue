@@ -84,7 +84,8 @@
               <div class="card-body text-center py-5 position-relative overflow-hidden">
                 <div class="auth-user-actions">
                   <span class="badge text-bg-light">{{ currentUser.name || currentUser.email }}</span>
-                  <button class="btn btn-sm btn-light ms-2" @click="handleLogout">Logout</button>
+                  <button class="btn btn-sm btn-light ms-2  bg-danger" @click="handleLogout"><i
+                      class="bi bi-power text-white"></i></button>
                 </div>
                 <div class="shimmer-effect"></div>
                 <h1 class="display-4 fw-bold mb-3">
@@ -366,7 +367,8 @@
                         {{ wallet }}
                       </option>
                     </select>
-                    <button @click="resetTransactionFilters" class="btn harmony-btn-outline btn-sm" title="Reset filters">
+                    <button @click="resetTransactionFilters" class="btn harmony-btn-outline btn-sm"
+                      title="Reset filters">
                       <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
                     <button @click="exportData" class="btn harmony-btn-outline btn-sm" title="Export to JSON">
@@ -454,9 +456,10 @@
                   <small class="harmony-text-muted">
                     Showing {{ paginationStart }}-{{ paginationEnd }} of {{ filteredTransactions.length }} transactions
                   </small>
-                  <div class="d-flex align-items-center gap-2">
+                  <div class="d-flex align-items-center gap-2 overflow-x-hidden">
                     <label class="small harmony-text-muted mb-0">Rows</label>
                     <select v-model.number="itemsPerPage" class="form-select form-select-sm" style="width: 80px;">
+                      <option :value="1">1</option>
                       <option :value="5">5</option>
                       <option :value="10">10</option>
                       <option :value="20">20</option>
@@ -465,14 +468,52 @@
                       :disabled="currentPage === 1">
                       Prev
                     </button>
-                    <button v-for="page in visiblePageNumbers" :key="page" @click="currentPage = page" class="btn btn-sm"
-                      :class="page === currentPage ? 'harmony-btn-primary' : 'harmony-btn-outline'">
+                    <button v-for="page in visiblePageNumbers" :key="page" @click="currentPage = page"
+                      class="btn btn-sm" :class="page === currentPage ? 'harmony-btn-primary' : 'harmony-btn-outline'">
                       {{ page }}
                     </button>
-                    <button @click="currentPage = Math.min(totalPages, currentPage + 1)" class="btn harmony-btn-outline btn-sm"
-                      :disabled="currentPage === totalPages">
+                    <button @click="currentPage = Math.min(totalPages, currentPage + 1)"
+                      class="btn harmony-btn-outline btn-sm" :disabled="currentPage === totalPages">
                       Next
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Wallet Balances -->
+            <div class="card wallet-balances-card harmony-shadow mt-4" :class="{ 'fade-in-up': mounted }"
+              style="animation-delay: 1.6s;">
+              <div class="card-header border-0 pt-4 px-4 bg-transparent">
+                <h4 class="mb-0 fw-bold harmony-text-gradient">
+                  <i class="bi bi-wallet2 me-2 harmony-text-accent1"></i>Wallet Balances
+                </h4>
+              </div>
+              <div class="card-body p-4">
+                <div v-if="walletBalanceCards.length === 0" class="text-center py-4">
+                  <i class="bi bi-wallet2 fs-2 mb-2 d-block harmony-text-muted"></i>
+                  <p class="harmony-text-muted mb-0">No wallet balances yet</p>
+                </div>
+                <div v-else class="row g-3">
+                  <div v-for="(wallet, index) in walletBalanceCards" :key="wallet.wallet" class="col-md-6 col-xl-4">
+                    <div class="wallet-balance-tile" :class="`harmony-border-${getWalletColor(index)}`">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold harmony-text-dark">{{ wallet.wallet }}</span>
+                        <span class="badge harmony-badge" :class="`harmony-bg-${getWalletColor(index)}`">Balance</span>
+                      </div>
+                      <div class="wallet-balance-amount"
+                        :class="wallet.balance >= 0 ? 'harmony-text-accent1' : 'harmony-text-expense'">
+                        {{ formatCurrency(wallet.balance) }}
+                      </div>
+                      <div class="d-flex justify-content-between small harmony-text-muted mt-2">
+                        <span>Income</span>
+                        <span class="harmony-text-accent1">+{{ formatCurrency(wallet.income) }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between small harmony-text-muted">
+                        <span>Expense</span>
+                        <span class="harmony-text-expense">-{{ formatCurrency(wallet.expense) }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -787,6 +828,38 @@ const walletFilterOptions = computed(() => {
   return Array.from(wallets)
 })
 
+const walletBalanceCards = computed(() => {
+  const wallets = new Set([
+    ...walletOptions,
+    ...transactions.value.map(e => e.wallet).filter(Boolean)
+  ])
+
+  if (transactions.value.some(e => !e.wallet)) {
+    wallets.add('Cash')
+  }
+
+  const totals = {}
+  wallets.forEach(wallet => {
+    totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 }
+  })
+
+  transactions.value.forEach(transaction => {
+    const wallet = transaction.wallet || 'Cash'
+    const amount = parseFloat(transaction.amount) || 0
+    if (!totals[wallet]) totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 }
+
+    if (transaction.expense_income === 'Income') totals[wallet].income += amount
+    if (transaction.expense_income === 'Expense') totals[wallet].expense += amount
+  })
+
+  return Object.values(totals)
+    .map(entry => ({
+      ...entry,
+      balance: entry.income - entry.expense
+    }))
+    .sort((a, b) => a.wallet.localeCompare(b.wallet))
+})
+
 const filteredTransactions = computed(() => {
   const query = searchQuery.value.toLowerCase()
 
@@ -956,6 +1029,11 @@ const formatCurrency = (amount) => {
     currency: 'IDR',
     minimumFractionDigits: 2
   }).format(amount)
+}
+
+const getWalletColor = (index) => {
+  const colors = ['primary', 'secondary', 'tertiary', 'accent1', 'accent2']
+  return colors[index % colors.length]
 }
 
 // Add transaction
@@ -1941,6 +2019,43 @@ optgroup option {
 .transactions-card.fade-in-up {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ============================================
+   WALLET BALANCES
+   ============================================ */
+
+.wallet-balances-card {
+  background: var(--harmony-card) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(13, 148, 136, 0.1) !important;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wallet-balances-card.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wallet-balance-tile {
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wallet-balance-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.wallet-balance-amount {
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 
 .harmony-table-header {
