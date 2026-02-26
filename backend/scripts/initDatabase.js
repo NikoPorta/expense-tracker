@@ -33,6 +33,7 @@ const initDatabase = async () => {
         expense_income ENUM('Expense', 'Income') NOT NULL DEFAULT 'Expense',
         amount DECIMAL(10, 2) NOT NULL,
         category ENUM('Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Send Transfer', 'Salary', 'Bonus', 'Get Transfer', 'Other') NOT NULL,
+        wallet VARCHAR(100) NOT NULL DEFAULT 'Cash',
         transaction_date DATE NOT NULL,
         created_by VARCHAR(255) NOT NULL DEFAULT 'Anonymous',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

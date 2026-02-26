@@ -26,6 +26,11 @@ class TransactionModel {
       params.push(`%${filters.search}%`);
     }
 
+    if (filters.wallet) {
+      query += ' AND wallet = ?';
+      params.push(filters.wallet);
+    }
+
     query += ' ORDER BY transaction_date DESC, created_at DESC';
 
     const [rows] = await pool.execute(query, params);
@@ -43,12 +48,12 @@ class TransactionModel {
 
   // Create new transaction
   static async create(transactionData) {
-    const { description, expense_income, amount, category, transaction_date } = transactionData;
+    const { description, expense_income, amount, category, wallet, transaction_date } = transactionData;
     
     const [result] = await pool.execute(
-      `INSERT INTO transactions (description, expense_income, amount, category, transaction_date, created_by) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [description, expense_income, amount, category, transaction_date, transactionData.created_by || 'Anonymous']
+      `INSERT INTO transactions (description, expense_income, amount, category, wallet, transaction_date, created_by) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [description, expense_income, amount, category, wallet || 'Cash', transaction_date, transactionData.created_by || 'Anonymous']
     );
 
     return {
@@ -61,13 +66,13 @@ class TransactionModel {
 
   // Update expense
   static async update(id, transactionData) {
-    const { description, amount, category, transaction_date } = transactionData;
+    const { description, amount, category, wallet, transaction_date } = transactionData;
     
     const [result] = await pool.execute(
       `UPDATE transactions 
-       SET description = ?, amount = ?, category = ?, transaction_date = ?, updated_at = CURRENT_TIMESTAMP
+       SET description = ?, amount = ?, category = ?, wallet = ?, transaction_date = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
-      [description, amount, category, transaction_date, id]
+      [description, amount, category, wallet || 'Cash', transaction_date, id]
     );
 
     return result.affectedRows > 0;

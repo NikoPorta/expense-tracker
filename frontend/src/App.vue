@@ -248,6 +248,26 @@
                   </div>
 
                   <div class="form-floating mb-4 input-group-animated">
+                    <select v-model="newTransaction.wallet" class="form-select harmony-input"
+                      :class="{ 'income-input': transactionType === 'income' }" id="walletInput" required
+                      @focus="activeField = 'wallet'" @blur="activeField = null">
+                      <option value="" disabled>Select wallet</option>
+                      <option v-for="wallet in walletOptions" :key="wallet" :value="wallet">
+                        {{ wallet }}
+                      </option>
+                    </select>
+                    <label for="walletInput" class="harmony-label">
+                      <i class="bi bi-wallet2 me-2"
+                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      Wallet
+                    </label>
+                    <div class="input-line harmony-line" :class="{
+                      'active': activeField === 'wallet',
+                      'income-line': transactionType === 'income'
+                    }"></div>
+                  </div>
+
+                  <div class="form-floating mb-4 input-group-animated">
                     <input v-model="newTransaction.transaction_date" type="date" class="form-control harmony-input"
                       :class="{ 'income-input': transactionType === 'income' }" id="dateInput" required
                       @focus="activeField = 'date'" @blur="activeField = null">
@@ -321,22 +341,41 @@
             <!-- Recent Transactions -->
             <div class="card transactions-card harmony-shadow" :class="{ 'fade-in-up': mounted }"
               style="animation-delay: 1.4s;">
-              <div
-                class="card-header border-0 pt-4 px-4 bg-transparent d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-bold harmony-text-gradient">
-                  <i class="bi bi-receipt me-2 harmony-text-tertiary"></i>Recent Transactions
-                </h4>
-                <div class="d-flex gap-2">
-                  <button @click="filter = 'all'" class="btn btn-sm"
-                    :class="filter === 'all' ? 'harmony-btn-primary' : 'harmony-btn-outline'">
-                    All
-                  </button>
-                  <button @click="exportData" class="btn harmony-btn-outline btn-sm" title="Export to JSON">
-                    <i class="bi bi-download harmony-text-secondary"></i>
-                  </button>
-                  <button @click="confirmClear" class="btn harmony-btn-danger-outline btn-sm">
-                    <i class="bi bi-trash"></i>
-                  </button>
+              <div class="card-header border-0 pt-4 px-4 bg-transparent">
+                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                  <h4 class="mb-0 fw-bold harmony-text-gradient">
+                    <i class="bi bi-receipt me-2 harmony-text-tertiary"></i>Recent Transactions
+                  </h4>
+                  <div class="d-flex flex-wrap gap-2">
+                    <input v-model.trim="searchQuery" type="text" class="form-control form-control-sm"
+                      placeholder="Search description/category/wallet..." style="width: 260px;">
+                    <select v-model="typeFilter" class="form-select form-select-sm" style="width: 130px;">
+                      <option value="all">All Type</option>
+                      <option value="Expense">Expense</option>
+                      <option value="Income">Income</option>
+                    </select>
+                    <select v-model="categoryFilter" class="form-select form-select-sm" style="width: 150px;">
+                      <option value="all">All Category</option>
+                      <option v-for="category in categoryFilterOptions" :key="category" :value="category">
+                        {{ category }}
+                      </option>
+                    </select>
+                    <select v-model="walletFilter" class="form-select form-select-sm" style="width: 150px;">
+                      <option value="all">All Wallet</option>
+                      <option v-for="wallet in walletFilterOptions" :key="wallet" :value="wallet">
+                        {{ wallet }}
+                      </option>
+                    </select>
+                    <button @click="resetTransactionFilters" class="btn harmony-btn-outline btn-sm" title="Reset filters">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                    <button @click="exportData" class="btn harmony-btn-outline btn-sm" title="Export to JSON">
+                      <i class="bi bi-download harmony-text-secondary"></i>
+                    </button>
+                    <button @click="confirmClear" class="btn harmony-btn-danger-outline btn-sm">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="card-body p-0">
@@ -347,13 +386,14 @@
                         <th class="ps-4 harmony-text-muted">Date</th>
                         <th class="harmony-text-muted">Description</th>
                         <th class="harmony-text-muted">Category</th>
+                        <th class="harmony-text-muted">Wallet</th>
                         <th class="harmony-text-muted">Amount</th>
                         <th class="text-center harmony-text-muted">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       <transition-group name="list">
-                        <tr v-for="(transaction, index) in filteredTransactions" :key="transaction.id"
+                        <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id"
                           class="align-middle transaction-row" :style="{ animationDelay: `${index * 0.05}s` }">
                           <td class="ps-4">
                             <div class="d-flex align-items-center">
@@ -374,6 +414,12 @@
                               {{ transaction.category }}
                             </span>
                           </td>
+                          <td>
+                            <span class="badge category-badge harmony-badge harmony-bg-neutral">
+                              <i class="bi bi-wallet2 me-1"></i>
+                              {{ transaction.wallet || 'Cash' }}
+                            </span>
+                          </td>
                           <td class="fw-bold"
                             :class="transaction.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
                             <span v-if="transaction.expense_income === 'Income'" class="amount-value income-amount">
@@ -392,16 +438,42 @@
                         </tr>
                       </transition-group>
                       <tr v-if="filteredTransactions.length === 0">
-                        <td colspan="5" class="text-center py-5 empty-state">
+                        <td colspan="6" class="text-center py-5 empty-state">
                           <div class="empty-animation">
                             <i class="bi bi-inbox fs-1 mb-3 d-block harmony-text-muted"></i>
-                            <p class="harmony-text-muted mb-0">No expenses found</p>
-                            <small class="harmony-text-light">Add your first transaction above!</small>
+                            <p class="harmony-text-muted mb-0">No transactions found</p>
+                            <small class="harmony-text-light">Try changing the filters or add a new transaction.</small>
                           </div>
                         </td>
                       </tr>
                     </tbody>
                   </table>
+                </div>
+                <div v-if="filteredTransactions.length > 0"
+                  class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 px-4 py-3 border-top">
+                  <small class="harmony-text-muted">
+                    Showing {{ paginationStart }}-{{ paginationEnd }} of {{ filteredTransactions.length }} transactions
+                  </small>
+                  <div class="d-flex align-items-center gap-2">
+                    <label class="small harmony-text-muted mb-0">Rows</label>
+                    <select v-model.number="itemsPerPage" class="form-select form-select-sm" style="width: 80px;">
+                      <option :value="5">5</option>
+                      <option :value="10">10</option>
+                      <option :value="20">20</option>
+                    </select>
+                    <button @click="currentPage = Math.max(1, currentPage - 1)" class="btn harmony-btn-outline btn-sm"
+                      :disabled="currentPage === 1">
+                      Prev
+                    </button>
+                    <button v-for="page in visiblePageNumbers" :key="page" @click="currentPage = page" class="btn btn-sm"
+                      :class="page === currentPage ? 'harmony-btn-primary' : 'harmony-btn-outline'">
+                      {{ page }}
+                    </button>
+                    <button @click="currentPage = Math.min(totalPages, currentPage + 1)" class="btn harmony-btn-outline btn-sm"
+                      :disabled="currentPage === totalPages">
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -433,7 +505,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import api from './services/api'
 import AuthService from './services/auth'
 
@@ -445,7 +517,12 @@ const headerText = ref('')
 const fullHeaderText = 'Daily Expense Tracker'
 const toasts = ref([])
 const confettiCanvas = ref(null)
-const filter = ref('all')
+const searchQuery = ref('')
+const typeFilter = ref('all')
+const categoryFilter = ref('all')
+const walletFilter = ref('all')
+const currentPage = ref(1)
+const itemsPerPage = ref(5)
 const validationErrors = ref({})
 const isProduction = AuthService.isProduction()
 const isAuthLoading = ref(true)
@@ -484,11 +561,13 @@ const harmonyColors = {
 }
 
 const transactions = ref([])
+const walletOptions = ['Cash Bogi', 'Cash Siwi', 'BCA Bogi (36)', 'BCA Siwi (44)', 'Mandiri Siwi']
 
 const newTransaction = ref({
   description: '',
   amount: '',
   category: '',
+  wallet: 'Cash Bogi',
   transaction_date: new Date().toISOString().split('T')[0],
   expense_income: 'expense'
 })
@@ -695,10 +774,71 @@ const sortedTransactions = computed(() => {
   )
 })
 
-const filteredTransactions = computed(() => {
-  if (filter.value === 'all') return sortedTransactions.value
-  return sortedTransactions.value.filter(e => e.category === filter.value)
+const categoryFilterOptions = computed(() => {
+  const categories = new Set(sortedTransactions.value.map(e => e.category).filter(Boolean))
+  return Array.from(categories)
 })
+
+const walletFilterOptions = computed(() => {
+  const wallets = new Set([
+    ...walletOptions,
+    ...sortedTransactions.value.map(e => e.wallet).filter(Boolean)
+  ])
+  return Array.from(wallets)
+})
+
+const filteredTransactions = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+
+  return sortedTransactions.value.filter(e => {
+    const matchesType = typeFilter.value === 'all' || e.expense_income === typeFilter.value
+    const matchesCategory = categoryFilter.value === 'all' || e.category === categoryFilter.value
+    const matchesWallet = walletFilter.value === 'all' || (e.wallet || 'Cash') === walletFilter.value
+    const matchesSearch = !query || `${e.description || ''} ${e.category || ''} ${e.wallet || 'Cash'} ${e.expense_income || ''}`
+      .toLowerCase()
+      .includes(query)
+    return matchesType && matchesCategory && matchesWallet && matchesSearch
+  })
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredTransactions.value.length / itemsPerPage.value)))
+
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  return filteredTransactions.value.slice(start, start + itemsPerPage.value)
+})
+
+const paginationStart = computed(() => (
+  filteredTransactions.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage.value + 1
+))
+
+const paginationEnd = computed(() => Math.min(currentPage.value * itemsPerPage.value, filteredTransactions.value.length))
+
+const visiblePageNumbers = computed(() => {
+  const maxButtons = 5
+  let start = Math.max(1, currentPage.value - 2)
+  let end = Math.min(totalPages.value, start + maxButtons - 1)
+  start = Math.max(1, end - maxButtons + 1)
+
+  const pages = []
+  for (let page = start; page <= end; page++) pages.push(page)
+  return pages
+})
+
+watch([searchQuery, typeFilter, categoryFilter, walletFilter, itemsPerPage], () => {
+  currentPage.value = 1
+})
+
+watch(filteredTransactions, () => {
+  if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
+}, { immediate: true })
+
+const resetTransactionFilters = () => {
+  searchQuery.value = ''
+  typeFilter.value = 'all'
+  categoryFilter.value = 'all'
+  walletFilter.value = 'all'
+}
 
 const totalIncome = computed(() => {
   return transactions.value
@@ -842,6 +982,7 @@ const addTransaction = async () => {
     description: '',
     amount: '',
     category: '',
+    wallet: 'Cash Bogi',
     transaction_date: new Date().toISOString().split('T')[0],
     expense_income: transactionType.value
   }

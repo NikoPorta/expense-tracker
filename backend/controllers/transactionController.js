@@ -44,6 +44,7 @@ const getAllTransactions = async (req, res, next) => {
   try {
     const filters = {
       category: req.query.category,
+      wallet: req.query.wallet,
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       search: req.query.search

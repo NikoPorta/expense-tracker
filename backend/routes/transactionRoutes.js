@@ -25,6 +25,9 @@ const createValidation = [
     .notEmpty().withMessage('Category is required')
     .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Send Transfer', 'Salary', 'Bonus', 'Get Transfer', 'Other'])
     .withMessage('Invalid category'),
+  body('wallet')
+    .notEmpty().withMessage('Wallet is required')
+    .isLength({ min: 2, max: 100 }).withMessage('Wallet must be 2-100 characters'),
   body('transaction_date')
     .notEmpty().withMessage('Date is required')
     .isISO8601().withMessage('Invalid date format'),
@@ -43,6 +46,9 @@ const updateValidation = [
     .optional()
     .isIn(['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Other', 'Bonus'])
     .withMessage('Invalid category'),
+  body('wallet')
+    .optional()
+    .isLength({ min: 2, max: 100 }).withMessage('Wallet must be 2-100 characters'),
   body('transaction_date')
     .optional()
     .isISO8601().withMessage('Invalid date format'),
