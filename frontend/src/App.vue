@@ -13,18 +13,32 @@
     </div>
 
     <div class="auth-card">
-      <h2 class="fw-bold mb-2">{{ authMode === 'login' ? 'Welcome back' : 'Create account' }}</h2>
+      <h2 class="fw-bold mb-2">
+        {{ authMode === "login" ? "Welcome back" : "Create account" }}
+      </h2>
       <p class="text-muted mb-4">
-        {{ authMode === 'login' ? 'Sign in to manage your expenses.' : 'Register and start tracking your finances.' }}
+        {{
+          authMode === "login"
+            ? "Sign in to manage your expenses."
+            : "Register and start tracking your finances."
+        }}
       </p>
 
       <div class="d-flex auth-switch mb-4">
-        <button class="btn flex-fill" :class="authMode === 'login' ? 'btn-primary' : 'btn-outline-primary'"
-          @click="authMode = 'login'">
+        <button
+          class="btn flex-fill"
+          :class="authMode === 'login' ? 'btn-primary' : 'btn-outline-primary'"
+          @click="authMode = 'login'"
+        >
           Login
         </button>
-        <button class="btn flex-fill" :class="authMode === 'register' ? 'btn-primary' : 'btn-outline-primary'"
-          @click="authMode = 'register'">
+        <button
+          class="btn flex-fill"
+          :class="
+            authMode === 'register' ? 'btn-primary' : 'btn-outline-primary'
+          "
+          @click="authMode = 'register'"
+        >
           Register
         </button>
       </div>
@@ -32,37 +46,68 @@
       <form @submit.prevent="handleAuthSubmit">
         <div class="mb-3" v-if="authMode === 'register'">
           <label class="form-label">Name</label>
-          <input v-model.trim="authForm.name" type="text" class="form-control" placeholder="Your name" />
+          <input
+            v-model.trim="authForm.name"
+            type="text"
+            class="form-control"
+            placeholder="Your name"
+          />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input v-model.trim="authForm.email" type="email" class="form-control" placeholder="you@example.com"
-            required />
+          <input
+            v-model.trim="authForm.email"
+            type="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+          />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Password</label>
-          <input v-model="authForm.password" type="password" class="form-control" placeholder="Minimum 6 characters"
-            required />
+          <input
+            v-model="authForm.password"
+            type="password"
+            class="form-control"
+            placeholder="Minimum 6 characters"
+            required
+          />
         </div>
 
         <div class="mb-3" v-if="authMode === 'register'">
           <label class="form-label">Confirm password</label>
-          <input v-model="authForm.confirmPassword" type="password" class="form-control" placeholder="Repeat password"
-            required />
+          <input
+            v-model="authForm.confirmPassword"
+            type="password"
+            class="form-control"
+            placeholder="Repeat password"
+            required
+          />
         </div>
 
-        <div v-if="authError" class="alert alert-danger py-2">{{ authError }}</div>
+        <div v-if="authError" class="alert alert-danger py-2">
+          {{ authError }}
+        </div>
 
-        <button type="submit" class="btn btn-primary w-100" :disabled="isAuthSubmitting">
-          <span v-if="!isAuthSubmitting">{{ authMode === 'login' ? 'Login' : 'Register' }}</span>
+        <button
+          type="submit"
+          class="btn btn-primary w-100"
+          :disabled="isAuthSubmitting"
+        >
+          <span v-if="!isAuthSubmitting">{{
+            authMode === "login" ? "Login" : "Register"
+          }}</span>
           <span v-else class="spinner-border spinner-border-sm"></span>
         </button>
       </form>
 
       <small class="d-block mt-3 text-muted">
-        Auth mode: <strong>{{ isProduction ? 'Firebase (production)' : 'Local storage (development)' }}</strong>
+        Auth mode:
+        <strong>{{
+          isProduction ? "Firebase (production)" : "Local storage (development)"
+        }}</strong>
       </small>
     </div>
   </div>
@@ -80,12 +125,23 @@
         <!-- Header -->
         <div class="row mb-4">
           <div class="col-12">
-            <div class="card glass-card header-card" :class="{ 'animate-in': mounted }">
-              <div class="card-body text-center py-5 position-relative overflow-hidden">
+            <div
+              class="card glass-card header-card"
+              :class="{ 'animate-in': mounted }"
+            >
+              <div
+                class="card-body text-center py-5 position-relative overflow-hidden"
+              >
                 <div class="auth-user-actions">
-                  <span class="badge text-bg-light">{{ currentUser.name || currentUser.email }}</span>
-                  <button class="btn btn-sm btn-light ms-2  bg-danger" @click="handleLogout"><i
-                      class="bi bi-power text-white"></i></button>
+                  <span class="badge text-bg-light">{{
+                    currentUser.name || currentUser.email
+                  }}</span>
+                  <button
+                    class="btn btn-sm btn-light ms-2 bg-danger"
+                    @click="handleLogout"
+                  >
+                    <i class="bi bi-power text-white"></i>
+                  </button>
                 </div>
                 <div class="shimmer-effect"></div>
                 <h1 class="display-4 fw-bold mb-3">
@@ -93,13 +149,25 @@
                   <span class="typewriter-text">{{ headerText }}</span>
                   <span class="cursor-blink">|</span>
                 </h1>
-                <p class="lead mb-0 harmony-text-light fade-in-up" :class="{ 'show': mounted }">
+                <p
+                  class="lead mb-0 harmony-text-light fade-in-up"
+                  :class="{ show: mounted }"
+                >
                   Manage your daily finances with harmony
                 </p>
                 <div class="floating-icons">
-                  <i class="bi bi-coin floating-icon harmony-text-accent1" style="--delay: 0s"></i>
-                  <i class="bi bi-cash-coin floating-icon harmony-text-accent2" style="--delay: 0.5s"></i>
-                  <i class="bi bi-piggy-bank floating-icon harmony-text-accent3" style="--delay: 1s"></i>
+                  <i
+                    class="bi bi-coin floating-icon harmony-text-accent1"
+                    style="--delay: 0s"
+                  ></i>
+                  <i
+                    class="bi bi-cash-coin floating-icon harmony-text-accent2"
+                    style="--delay: 0.5s"
+                  ></i>
+                  <i
+                    class="bi bi-piggy-bank floating-icon harmony-text-accent3"
+                    style="--delay: 1s"
+                  ></i>
                 </div>
               </div>
             </div>
@@ -108,25 +176,50 @@
 
         <!-- Summary Cards with Harmony Colors -->
         <div class="row g-4 mb-4">
-          <div v-for="(card, index) in summaryCards" :key="card.type" class="col-md-4">
-            <div class="card summary-card h-100 harmony-shadow"
-              :class="[`harmony-border-${card.harmonyColor}`, { 'slide-up': mounted }]"
-              :style="{ animationDelay: `${index * 0.15 + 0.5}s` }">
-              <div class="card-body text-center position-relative overflow-hidden">
+          <div
+            v-for="(card, index) in summaryCards"
+            :key="card.type"
+            class="col-md-4"
+          >
+            <div
+              class="card summary-card h-100 harmony-shadow"
+              :class="[
+                `harmony-border-${card.harmonyColor}`,
+                { 'slide-up': mounted },
+              ]"
+              :style="{ animationDelay: `${index * 0.15 + 0.5}s` }"
+            >
+              <div
+                class="card-body text-center position-relative overflow-hidden"
+              >
                 <div class="card-shine"></div>
-                <div class="icon-wrapper mb-3" :class="`harmony-bg-${card.harmonyColor}`">
+                <div
+                  class="icon-wrapper mb-3"
+                  :class="`harmony-bg-${card.harmonyColor}`"
+                >
                   <i :class="`bi ${card.icon} fs-2`"></i>
                 </div>
-                <h5 class="card-title harmony-text-muted mb-2">{{ card.title }}</h5>
-                <h2 class="fw-bold counter-text" :class="`harmony-text-${card.harmonyColor}`">
+                <h5 class="card-title harmony-text-muted mb-2">
+                  {{ card.title }}
+                </h5>
+                <h2
+                  class="fw-bold counter-text"
+                  :class="`harmony-text-${card.harmonyColor}`"
+                >
                   <div v-if="card.title === 'Transactions'">
-                    <span class="counter-transactions" :data-target="card.value">$0.00</span>
+                    <span class="counter-transactions" :data-target="card.value"
+                      >$0.00</span
+                    >
                   </div>
                   <div v-else>
                     <span class="counter" :data-target="card.value">$0.00</span>
                   </div>
                 </h2>
-                <div class="trend-indicator" v-if="card.trend" :class="`harmony-text-${card.trendColor}`">
+                <div
+                  class="trend-indicator"
+                  v-if="card.trend"
+                  :class="`harmony-text-${card.trendColor}`"
+                >
                   <i :class="`bi ${card.trendIcon} me-1`"></i>
                   <small>{{ card.trend }}</small>
                 </div>
@@ -138,30 +231,73 @@
         <div class="row g-4">
           <!-- Add Transaction Form (Expense/Income Toggle) -->
           <div class="col-lg-4">
-            <div class="card form-card sticky-top harmony-shadow" :class="{ 'slide-in-left': mounted }"
-              style="top: 20px; animation-delay: 0.8s;">
+            <div
+              class="card form-card sticky-top harmony-shadow"
+              :class="{ 'slide-in-left': mounted }"
+              style="top: 20px; animation-delay: 0.8s"
+            >
               <div class="card-header border-0 pt-4 px-4 bg-transparent">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
                   <h4 class="mb-0 fw-bold harmony-text-gradient">
-                    <i class="bi me-2 pulse-icon"
-                      :class="transactionType === 'expense' ? 'bi-dash-circle-fill harmony-text-expense' : 'bi-plus-circle-fill harmony-text-accent1'"></i>
-                    {{ transactionType === 'expense' ? 'Add Expense' : 'Add Income' }}
+                    <i
+                      class="bi me-2 pulse-icon"
+                      :class="
+                        transactionType === 'expense'
+                          ? 'bi-dash-circle-fill harmony-text-expense'
+                          : transactionType === 'income'
+                            ? 'bi-plus-circle-fill harmony-text-accent1'
+                            : 'bi-arrow-left-right harmony-text-secondary'
+                      "
+                    ></i>
+                    {{
+                      transactionType === "expense"
+                        ? "Add Expense"
+                        : transactionType === "income"
+                          ? "Add Income"
+                          : "Transfer Balance"
+                    }}
                   </h4>
                 </div>
 
                 <!-- Toggle Switch -->
                 <div class="transaction-toggle-wrapper">
-                  <div class="transaction-toggle" :class="{ 'income-active': transactionType === 'income' }"
-                    @click="toggleTransactionType">
+                  <div
+                    class="transaction-toggle"
+                    :class="{
+                      'income-active': transactionType === 'income',
+                      'transfer-active': transactionType === 'transfer',
+                    }"
+                  >
                     <div class="toggle-slider">
-                      <div class="toggle-option expense-option" :class="{ active: transactionType === 'expense' }">
+                      <button
+                        type="button"
+                        class="toggle-option expense-option"
+                        :class="{ active: transactionType === 'expense' }"
+                        @click="setTransactionType('expense')"
+                      >
                         <i class="bi bi-arrow-down-circle"></i>
                         <span>Expense</span>
-                      </div>
-                      <div class="toggle-option income-option" :class="{ active: transactionType === 'income' }">
+                      </button>
+                      <button
+                        type="button"
+                        class="toggle-option income-option"
+                        :class="{ active: transactionType === 'income' }"
+                        @click="setTransactionType('income')"
+                      >
                         <i class="bi bi-arrow-up-circle"></i>
                         <span>Income</span>
-                      </div>
+                      </button>
+                      <button
+                        type="button"
+                        class="toggle-option transfer-option"
+                        :class="{ active: transactionType === 'transfer' }"
+                        @click="setTransactionType('transfer')"
+                      >
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Transfer</span>
+                      </button>
                       <div class="toggle-indicator"></div>
                     </div>
                   </div>
@@ -169,61 +305,179 @@
               </div>
 
               <div class="card-body p-4">
-                <form @submit.prevent="addTransaction" class="needs-validation" novalidate>
+                <form
+                  @submit.prevent="addTransaction"
+                  class="needs-validation"
+                  novalidate
+                >
                   <!-- Transaction Type Indicator -->
-                  <div class="transaction-type-badge mb-3"
-                    :class="transactionType === 'expense' ? 'expense-badge' : 'income-badge'">
-                    <i class="bi"
-                      :class="transactionType === 'expense' ? 'bi-arrow-down-circle-fill' : 'bi-arrow-up-circle-fill'"></i>
+                  <div
+                    class="transaction-type-badge mb-3"
+                    :class="
+                      transactionType === 'expense'
+                        ? 'expense-badge'
+                        : transactionType === 'income'
+                          ? 'income-badge'
+                          : 'transfer-badge'
+                    "
+                  >
+                    <i
+                      class="bi"
+                      :class="
+                        transactionType === 'expense'
+                          ? 'bi-arrow-down-circle-fill'
+                          : transactionType === 'income'
+                            ? 'bi-arrow-up-circle-fill'
+                            : 'bi-arrow-left-right'
+                      "
+                    ></i>
                     <span>You're adding an {{ transactionType }}</span>
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
-                    <input v-model.trim="newTransaction.description" type="text" class="form-control harmony-input"
+                    <input
+                      v-model.trim="newTransaction.description"
+                      type="text"
+                      class="form-control harmony-input"
                       :class="{
                         'income-input': transactionType === 'income',
-                        'is-invalid': validationErrors?.description
-                      }" id="descInput" placeholder="Description" required @focus="activeField = 'desc'"
-                      @blur="activeField = null">
+                        'transfer-input': transactionType === 'transfer',
+                        'is-invalid': validationErrors?.description,
+                      }"
+                      id="descInput"
+                      placeholder="Description"
+                      required
+                      @focus="activeField = 'desc'"
+                      @blur="activeField = null"
+                    />
                     <label for="descInput" class="harmony-label">
-                      <i class="bi bi-pencil me-2"
-                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      <i
+                        class="bi bi-pencil me-2"
+                        :class="
+                          transactionType === 'expense'
+                            ? 'harmony-text-primary'
+                            : transactionType === 'income'
+                              ? 'harmony-text-accent1'
+                              : 'harmony-text-secondary'
+                        "
+                      ></i>
                       Description
                     </label>
-                    <div class="input-line harmony-line" :class="{
-                      'active': activeField === 'desc',
-                      'income-line': transactionType === 'income'
-                    }"></div>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'desc',
+                        'income-line': transactionType === 'income',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
                     <div class="amount-input-wrapper">
-                      <span class="currency-symbol"
-                        :class="transactionType === 'expense' ? 'expense-symbol' : 'income-symbol'">
-                        {{ transactionType === 'expense' ? '-' : '+' }}
+                      <span
+                        class="currency-symbol"
+                        :class="
+                          transactionType === 'expense'
+                            ? 'expense-symbol'
+                            : transactionType === 'income'
+                              ? 'income-symbol'
+                              : 'transfer-symbol'
+                        "
+                      >
+                        {{
+                          transactionType === "expense"
+                            ? "-"
+                            : transactionType === "income"
+                              ? "+"
+                              : "<>"
+                        }}
                       </span>
-                      <input v-model.number="newTransaction.amount" type="number" step="0.01" min="0"
-                        class="form-control harmony-input amount-input" :class="{
+                      <input
+                        v-model.number="newTransaction.amount"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="form-control harmony-input amount-input"
+                        :class="{
                           'income-input': transactionType === 'income',
-                          'is-invalid': validationErrors?.amount
-                        }" id="amountInput" placeholder="0.00" required @focus="activeField = 'amount'"
-                        @blur="activeField = null" :aria-label="'Enter ' + transactionType + ' amount'">
+                          'transfer-input': transactionType === 'transfer',
+                          'is-invalid': validationErrors?.amount,
+                        }"
+                        id="amountInput"
+                        placeholder="0.00"
+                        required
+                        @focus="activeField = 'amount'"
+                        @blur="activeField = null"
+                        :aria-label="'Enter ' + transactionType + ' amount'"
+                      />
                     </div>
-                    <div class="input-line harmony-line" :class="{
-                      'active': activeField === 'amount',
-                      'income-line': transactionType === 'income'
-                    }"></div>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'amount',
+                        'income-line': transactionType === 'income',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
                   </div>
 
-                  <div class="form-floating mb-3 input-group-animated">
-                    <select v-model="newTransaction.category" class="form-select harmony-input" :class="{
-                      'income-input': transactionType === 'income',
-                      'is-invalid': validationErrors?.category
-                    }" id="categoryInput" required @focus="activeField = 'category'" @blur="activeField = null">
-                      <option value="" disabled selected>Select category</option>
+                  <div
+                    v-if="transactionType === 'transfer'"
+                    class="form-floating mb-3 input-group-animated"
+                  >
+                    <input
+                      v-model.number="newTransaction.admin_fee"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      class="form-control harmony-input transfer-input"
+                      :class="{ 'is-invalid': validationErrors?.admin_fee }"
+                      id="adminFeeInput"
+                      placeholder="0.00"
+                      @focus="activeField = 'admin_fee'"
+                      @blur="activeField = null"
+                    />
+                    <label for="adminFeeInput" class="harmony-label">
+                      <i
+                        class="bi bi-receipt-cutoff me-2 harmony-text-secondary"
+                      ></i>
+                      Admin Fee (Optional)
+                    </label>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'admin_fee',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
+                  </div>
+
+                  <div
+                    v-if="transactionType !== 'transfer'"
+                    class="form-floating mb-3 input-group-animated"
+                  >
+                    <select
+                      v-model="newTransaction.category"
+                      class="form-select harmony-input"
+                      :class="{
+                        'income-input': transactionType === 'income',
+                        'is-invalid': validationErrors?.category,
+                      }"
+                      id="categoryInput"
+                      required
+                      @focus="activeField = 'category'"
+                      @blur="activeField = null"
+                    >
+                      <option value="" disabled selected>
+                        Select category
+                      </option>
 
                       <!-- Expense Categories -->
-                      <optgroup v-if="transactionType === 'expense'" label="Expense Categories">
+                      <optgroup
+                        v-if="transactionType === 'expense'"
+                        label="Expense Categories"
+                      >
                         <option value="Food">🍔 Food & Dining</option>
                         <option value="Transport">🚗 Transport</option>
                         <option value="Shopping">🛍️ Shopping</option>
@@ -242,62 +496,194 @@
                       </optgroup>
                     </select>
                     <label for="categoryInput" class="harmony-label">
-                      <i class="bi bi-tag me-2"
-                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      <i
+                        class="bi bi-tag me-2"
+                        :class="
+                          transactionType === 'expense'
+                            ? 'harmony-text-primary'
+                            : 'harmony-text-accent1'
+                        "
+                      ></i>
                       Category
                     </label>
-                    <div class="input-line harmony-line" :class="{
-                      'active': activeField === 'category',
-                      'income-line': transactionType === 'income'
-                    }"></div>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'category',
+                        'income-line': transactionType === 'income',
+                      }"
+                    ></div>
                   </div>
 
-                  <div class="form-floating mb-4 input-group-animated">
-                    <select v-model="newTransaction.wallet" class="form-select harmony-input" :class="{
-                      'income-input': transactionType === 'income',
-                      'is-invalid': validationErrors?.wallet
-                    }" id="walletInput" required @focus="activeField = 'wallet'" @blur="activeField = null">
-                      <option value="" disabled>Select wallet</option>
-                      <option v-for="wallet in walletOptions" :key="wallet" :value="wallet">
+                  <div class="form-floating mb-3 input-group-animated">
+                    <select
+                      v-model="newTransaction.wallet"
+                      class="form-select harmony-input"
+                      :class="{
+                        'income-input': transactionType === 'income',
+                        'transfer-input': transactionType === 'transfer',
+                        'is-invalid': validationErrors?.wallet,
+                      }"
+                      id="walletInput"
+                      required
+                      @focus="activeField = 'wallet'"
+                      @blur="activeField = null"
+                    >
+                      <option value="" disabled>
+                        {{
+                          transactionType === "transfer"
+                            ? "Select source wallet"
+                            : "Select wallet"
+                        }}
+                      </option>
+                      <option
+                        v-for="wallet in walletOptions"
+                        :key="wallet"
+                        :value="wallet"
+                      >
                         {{ wallet }}
                       </option>
                     </select>
                     <label for="walletInput" class="harmony-label">
-                      <i class="bi bi-wallet2 me-2"
-                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
-                      Wallet
+                      <i
+                        class="bi bi-wallet2 me-2"
+                        :class="
+                          transactionType === 'expense'
+                            ? 'harmony-text-primary'
+                            : transactionType === 'income'
+                              ? 'harmony-text-accent1'
+                              : 'harmony-text-secondary'
+                        "
+                      ></i>
+                      {{
+                        transactionType === "transfer"
+                          ? "From Wallet"
+                          : "Wallet"
+                      }}
                     </label>
-                    <div class="input-line harmony-line" :class="{
-                      'active': activeField === 'wallet',
-                      'income-line': transactionType === 'income'
-                    }"></div>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'wallet',
+                        'income-line': transactionType === 'income',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
+                  </div>
+
+                  <div
+                    v-if="transactionType === 'transfer'"
+                    class="form-floating mb-4 input-group-animated"
+                  >
+                    <select
+                      v-model="newTransaction.transfer_to_wallet"
+                      class="form-select harmony-input"
+                      :class="{
+                        'transfer-input': transactionType === 'transfer',
+                        'is-invalid': validationErrors?.transfer_to_wallet,
+                      }"
+                      id="toWalletInput"
+                      required
+                      @focus="activeField = 'to_wallet'"
+                      @blur="activeField = null"
+                    >
+                      <option value="" disabled>
+                        Select destination wallet
+                      </option>
+                      <option
+                        v-for="wallet in walletOptions"
+                        :key="'to-' + wallet"
+                        :value="wallet"
+                      >
+                        {{ wallet }}
+                      </option>
+                    </select>
+                    <label for="toWalletInput" class="harmony-label">
+                      <i class="bi bi-wallet2 me-2 harmony-text-secondary"></i>
+                      To Wallet
+                    </label>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'to_wallet',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
                   </div>
 
                   <div class="form-floating mb-4 input-group-animated">
-                    <input v-model="newTransaction.transaction_date" type="date" class="form-control harmony-input"
-                      :class="{ 'income-input': transactionType === 'income' }" id="dateInput" required
-                      @focus="activeField = 'date'" @blur="activeField = null">
+                    <input
+                      v-model="newTransaction.transaction_date"
+                      type="date"
+                      class="form-control harmony-input"
+                      :class="{
+                        'income-input': transactionType === 'income',
+                        'transfer-input': transactionType === 'transfer',
+                      }"
+                      id="dateInput"
+                      required
+                      @focus="activeField = 'date'"
+                      @blur="activeField = null"
+                    />
                     <label for="dateInput" class="harmony-label">
-                      <i class="bi bi-calendar me-2"
-                        :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
+                      <i
+                        class="bi bi-calendar me-2"
+                        :class="
+                          transactionType === 'expense'
+                            ? 'harmony-text-primary'
+                            : transactionType === 'income'
+                              ? 'harmony-text-accent1'
+                              : 'harmony-text-secondary'
+                        "
+                      ></i>
                       Date
                     </label>
-                    <div class="input-line harmony-line" :class="{
-                      'active': activeField === 'date',
-                      'income-line': transactionType === 'income'
-                    }"></div>
+                    <div
+                      class="input-line harmony-line"
+                      :class="{
+                        active: activeField === 'date',
+                        'income-line': transactionType === 'income',
+                        'transfer-line': transactionType === 'transfer',
+                      }"
+                    ></div>
                   </div>
 
-                  <button type="submit" class="btn w-100 btn-lg submit-btn" :class="[
-                    transactionType === 'expense' ? 'harmony-btn-expense' : 'harmony-btn-income',
-                    { 'loading': isSubmitting }
-                  ]">
+                  <button
+                    type="submit"
+                    class="btn w-100 btn-lg submit-btn"
+                    :class="[
+                      transactionType === 'expense'
+                        ? 'harmony-btn-expense'
+                        : transactionType === 'income'
+                          ? 'harmony-btn-income'
+                          : 'harmony-btn-transfer',
+                      { loading: isSubmitting },
+                    ]"
+                  >
                     <span class="btn-content">
-                      <i class="bi me-2" :class="transactionType === 'expense' ? 'bi-plus-lg' : 'bi-plus-lg'"></i>
+                      <i
+                        class="bi me-2"
+                        :class="
+                          transactionType === 'transfer'
+                            ? 'bi-arrow-left-right'
+                            : 'bi-plus-lg'
+                        "
+                      ></i>
                       <span v-if="!isSubmitting">
-                        Add {{ transactionType === 'expense' ? 'Expense' : 'Income' }}
+                        {{
+                          transactionType === "transfer"
+                            ? "Transfer Balance"
+                            : `Add ${
+                                transactionType === "expense"
+                                  ? "Expense"
+                                  : "Income"
+                              }`
+                        }}
                       </span>
-                      <span v-else class="spinner-border spinner-border-sm"></span>
+                      <span
+                        v-else
+                        class="spinner-border spinner-border-sm"
+                      ></span>
                     </span>
                     <div class="btn-ripple"></div>
                   </button>
@@ -309,32 +695,59 @@
           <!-- Charts & List -->
           <div class="col-lg-8">
             <!-- Category Breakdown -->
-            <div class="card chart-card mb-4 harmony-shadow" :class="{ 'fade-in-scale': mounted }"
-              style="animation-delay: 1s;">
+            <div
+              class="card chart-card mb-4 harmony-shadow"
+              :class="{ 'fade-in-scale': mounted }"
+              style="animation-delay: 1s"
+            >
               <div class="card-header border-0 pt-4 px-4 bg-transparent">
                 <h4 class="mb-0 fw-bold harmony-text-gradient">
-                  <i class="bi bi-pie-chart-fill me-2 harmony-text-secondary"></i>Spending Analytics
+                  <i
+                    class="bi bi-pie-chart-fill me-2 harmony-text-secondary"
+                  ></i
+                  >Spending Analytics
                 </h4>
               </div>
               <div class="card-body p-4">
                 <div class="row g-4">
-                  <div v-for="(amount, category, index) in categoryTotals" :key="category" class="col-md-6">
-                    <div class="category-item" :class="{ 'slide-in-right': mounted }"
-                      :style="{ animationDelay: `${index * 0.1 + 1.2}s` }">
+                  <div
+                    v-for="(amount, category, index) in categoryTotals"
+                    :key="category"
+                    class="col-md-6"
+                  >
+                    <div
+                      class="category-item"
+                      :class="{ 'slide-in-right': mounted }"
+                      :style="{ animationDelay: `${index * 0.1 + 1.2}s` }"
+                    >
                       <div class="d-flex align-items-center mb-2">
-                        <div class="category-icon harmony-icon-shadow"
-                          :class="`harmony-bg-${getHarmonyColor(category)}`">
+                        <div
+                          class="category-icon harmony-icon-shadow"
+                          :class="`harmony-bg-${getHarmonyColor(category)}`"
+                        >
                           <i :class="`bi ${getCategoryIcon(category)}`"></i>
                         </div>
                         <div class="flex-grow-1 ms-3">
                           <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-semibold harmony-text-dark">{{ category }}</span>
-                            <span class="fw-bold harmony-text-primary">{{ formatCurrency(amount) }}</span>
+                            <span class="fw-semibold harmony-text-dark">{{
+                              category
+                            }}</span>
+                            <span class="fw-bold harmony-text-primary">{{
+                              formatCurrency(amount)
+                            }}</span>
                           </div>
-                          <div class="progress progress-animated" style="height: 8px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated harmony-progress"
-                              :class="`harmony-bg-${getHarmonyColor(category)}`" :style="{ width: '0%' }"
-                              :data-width="(amount / totalTransactions * 100) + '%'"></div>
+                          <div
+                            class="progress progress-animated"
+                            style="height: 8px"
+                          >
+                            <div
+                              class="progress-bar progress-bar-striped progress-bar-animated harmony-progress"
+                              :class="`harmony-bg-${getHarmonyColor(category)}`"
+                              :style="{ width: '0%' }"
+                              :data-width="
+                                (amount / totalTransactions) * 100 + '%'
+                              "
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -345,41 +758,82 @@
             </div>
 
             <!-- Recent Transactions -->
-            <div class="card transactions-card harmony-shadow" :class="{ 'fade-in-up': mounted }"
-              style="animation-delay: 1.4s;">
+            <div
+              class="card transactions-card harmony-shadow"
+              :class="{ 'fade-in-up': mounted }"
+              style="animation-delay: 1.4s"
+            >
               <div class="card-header border-0 pt-4 px-4 bg-transparent">
-                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                <div
+                  class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3"
+                >
                   <h4 class="mb-0 fw-bold harmony-text-gradient">
-                    <i class="bi bi-receipt me-2 harmony-text-tertiary"></i>Recent Transactions
+                    <i class="bi bi-receipt me-2 harmony-text-tertiary"></i
+                    >Recent Transactions
                   </h4>
                   <div class="d-flex flex-wrap gap-2">
-                    <input v-model.trim="searchQuery" type="text" class="form-control form-control-sm"
-                      placeholder="Search description/category/wallet..." style="width: 260px;">
-                    <select v-model="typeFilter" class="form-select form-select-sm" style="width: 130px;">
+                    <input
+                      v-model.trim="searchQuery"
+                      type="text"
+                      class="form-control form-control-sm"
+                      placeholder="Search description/category/wallet..."
+                      style="width: 260px"
+                    />
+                    <select
+                      v-model="typeFilter"
+                      class="form-select form-select-sm"
+                      style="width: 130px"
+                    >
                       <option value="all">All Type</option>
                       <option value="Expense">Expense</option>
                       <option value="Income">Income</option>
                     </select>
-                    <select v-model="categoryFilter" class="form-select form-select-sm" style="width: 150px;">
+                    <select
+                      v-model="categoryFilter"
+                      class="form-select form-select-sm"
+                      style="width: 150px"
+                    >
                       <option value="all">All Category</option>
-                      <option v-for="category in categoryFilterOptions" :key="category" :value="category">
+                      <option
+                        v-for="category in categoryFilterOptions"
+                        :key="category"
+                        :value="category"
+                      >
                         {{ category }}
                       </option>
                     </select>
-                    <select v-model="walletFilter" class="form-select form-select-sm" style="width: 150px;">
+                    <select
+                      v-model="walletFilter"
+                      class="form-select form-select-sm"
+                      style="width: 150px"
+                    >
                       <option value="all">All Wallet</option>
-                      <option v-for="wallet in walletFilterOptions" :key="wallet" :value="wallet">
+                      <option
+                        v-for="wallet in walletFilterOptions"
+                        :key="wallet"
+                        :value="wallet"
+                      >
                         {{ wallet }}
                       </option>
                     </select>
-                    <button @click="resetTransactionFilters" class="btn harmony-btn-outline btn-sm"
-                      title="Reset filters">
+                    <button
+                      @click="resetTransactionFilters"
+                      class="btn harmony-btn-outline btn-sm"
+                      title="Reset filters"
+                    >
                       <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
-                    <button @click="exportData" class="btn harmony-btn-outline btn-sm" title="Export to JSON">
+                    <button
+                      @click="exportData"
+                      class="btn harmony-btn-outline btn-sm"
+                      title="Export to JSON"
+                    >
                       <i class="bi bi-download harmony-text-secondary"></i>
                     </button>
-                    <button @click="confirmClear" class="btn harmony-btn-danger-outline btn-sm">
+                    <button
+                      @click="confirmClear"
+                      class="btn harmony-btn-danger-outline btn-sm"
+                    >
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>
@@ -400,36 +854,65 @@
                     </thead>
                     <tbody>
                       <transition-group name="list">
-                        <tr v-for="(transaction, index) in paginatedTransactions" :key="transaction.id"
-                          class="align-middle transaction-row" :style="{ animationDelay: `${index * 0.05}s` }">
+                        <tr
+                          v-for="(transaction, index) in paginatedTransactions"
+                          :key="transaction.id"
+                          class="align-middle transaction-row"
+                          :style="{ animationDelay: `${index * 0.05}s` }"
+                        >
                           <td class="ps-4">
                             <div class="d-flex align-items-center">
-                              <div class="date-badge harmony-gradient-primary me-2">
-                                <span class="day">{{ formatDay(transaction.transaction_date) }}</span>
-                                <span class="month">{{ formatMonth(transaction.transaction_date) }}</span>
+                              <div
+                                class="date-badge harmony-gradient-primary me-2"
+                              >
+                                <span class="day">{{
+                                  formatDay(transaction.transaction_date)
+                                }}</span>
+                                <span class="month">{{
+                                  formatMonth(transaction.transaction_date)
+                                }}</span>
                               </div>
                             </div>
                           </td>
                           <td>
-                            <div class="fw-semibold harmony-text-dark">{{ transaction.description }}</div>
-                            <small class="harmony-text-muted">{{ formatTime(transaction.transaction_date) }}</small>
+                            <div class="fw-semibold harmony-text-dark">
+                              {{ transaction.description }}
+                            </div>
+                            <small class="harmony-text-muted">{{
+                              formatTime(transaction.transaction_date)
+                            }}</small>
                           </td>
                           <td>
-                            <span class="badge category-badge harmony-badge"
-                              :class="`harmony-bg-${getHarmonyColor(transaction.category)}`">
-                              <i :class="`bi ${getCategoryIcon(transaction.category)} me-1`"></i>
+                            <span
+                              class="badge category-badge harmony-badge"
+                              :class="`harmony-bg-${getHarmonyColor(transaction.category)}`"
+                            >
+                              <i
+                                :class="`bi ${getCategoryIcon(transaction.category)} me-1`"
+                              ></i>
                               {{ transaction.category }}
                             </span>
                           </td>
                           <td>
-                            <span class="badge category-badge harmony-badge harmony-bg-neutral">
+                            <span
+                              class="badge category-badge harmony-badge harmony-bg-neutral"
+                            >
                               <i class="bi bi-wallet2 me-1"></i>
-                              {{ transaction.wallet || 'Cash' }}
+                              {{ transaction.wallet || "Cash" }}
                             </span>
                           </td>
-                          <td class="fw-bold"
-                            :class="transaction.expense_income === 'Income' ? 'harmony-text-accent1' : 'harmony-text-expense'">
-                            <span v-if="transaction.expense_income === 'Income'" class="amount-value income-amount">
+                          <td
+                            class="fw-bold"
+                            :class="
+                              transaction.expense_income === 'Income'
+                                ? 'harmony-text-accent1'
+                                : 'harmony-text-expense'
+                            "
+                          >
+                            <span
+                              v-if="transaction.expense_income === 'Income'"
+                              class="amount-value income-amount"
+                            >
                               +{{ formatCurrency(transaction.amount) }}
                             </span>
                             <span v-else class="amount-value">
@@ -437,8 +920,11 @@
                             </span>
                           </td>
                           <td class="text-center">
-                            <button @click="deleteTransaction(transaction.id)"
-                              class="btn btn-delete harmony-btn-delete btn-sm" title="Delete">
+                            <button
+                              @click="deleteTransaction(transaction.id)"
+                              class="btn btn-delete harmony-btn-delete btn-sm"
+                              title="Delete"
+                            >
                               <i class="bi bi-x-lg"></i>
                             </button>
                           </td>
@@ -447,38 +933,69 @@
                       <tr v-if="filteredTransactions.length === 0">
                         <td colspan="6" class="text-center py-5 empty-state">
                           <div class="empty-animation">
-                            <i class="bi bi-inbox fs-1 mb-3 d-block harmony-text-muted"></i>
-                            <p class="harmony-text-muted mb-0">No transactions found</p>
-                            <small class="harmony-text-light">Try changing the filters or add a new transaction.</small>
+                            <i
+                              class="bi bi-inbox fs-1 mb-3 d-block harmony-text-muted"
+                            ></i>
+                            <p class="harmony-text-muted mb-0">
+                              No transactions found
+                            </p>
+                            <small class="harmony-text-light"
+                              >Try changing the filters or add a new
+                              transaction.</small
+                            >
                           </div>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <div v-if="filteredTransactions.length > 0"
-                  class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 px-4 py-3 border-top">
+                <div
+                  v-if="filteredTransactions.length > 0"
+                  class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 px-4 py-3 border-top"
+                >
                   <small class="harmony-text-muted">
-                    Showing {{ paginationStart }}-{{ paginationEnd }} of {{ filteredTransactions.length }} transactions
+                    Showing {{ paginationStart }}-{{ paginationEnd }} of
+                    {{ filteredTransactions.length }} transactions
                   </small>
-                  <div class="d-flex align-items-center gap-2 overflow-x-hidden">
+                  <div class="d-flex align-items-center gap-2 overflow-x-auto">
                     <label class="small harmony-text-muted mb-0">Rows</label>
-                    <select v-model.number="itemsPerPage" class="form-select form-select-sm" style="width: 80px;">
+                    <select
+                      v-model.number="itemsPerPage"
+                      class="form-select form-select-sm"
+                      style="width: 80px"
+                    >
                       <option :value="1">1</option>
                       <option :value="5">5</option>
                       <option :value="10">10</option>
                       <option :value="20">20</option>
                     </select>
-                    <button @click="currentPage = Math.max(1, currentPage - 1)" class="btn harmony-btn-outline btn-sm"
-                      :disabled="currentPage === 1">
+                    <button
+                      @click="currentPage = Math.max(1, currentPage - 1)"
+                      class="btn harmony-btn-outline btn-sm"
+                      :disabled="currentPage === 1"
+                    >
                       Prev
                     </button>
-                    <button v-for="page in visiblePageNumbers" :key="page" @click="currentPage = page"
-                      class="btn btn-sm" :class="page === currentPage ? 'harmony-btn-primary' : 'harmony-btn-outline'">
+                    <button
+                      v-for="page in visiblePageNumbers"
+                      :key="page"
+                      @click="currentPage = page"
+                      class="btn btn-sm"
+                      :class="
+                        page === currentPage
+                          ? 'harmony-btn-primary'
+                          : 'harmony-btn-outline'
+                      "
+                    >
                       {{ page }}
                     </button>
-                    <button @click="currentPage = Math.min(totalPages, currentPage + 1)"
-                      class="btn harmony-btn-outline btn-sm" :disabled="currentPage === totalPages">
+                    <button
+                      @click="
+                        currentPage = Math.min(totalPages, currentPage + 1)
+                      "
+                      class="btn harmony-btn-outline btn-sm"
+                      :disabled="currentPage === totalPages"
+                    >
                       Next
                     </button>
                   </div>
@@ -487,36 +1004,74 @@
             </div>
 
             <!-- Wallet Balances -->
-            <div class="card wallet-balances-card harmony-shadow mt-4" :class="{ 'fade-in-up': mounted }"
-              style="animation-delay: 1.6s;">
+            <div
+              class="card wallet-balances-card harmony-shadow mt-4"
+              :class="{ 'fade-in-up': mounted }"
+              style="animation-delay: 1.6s"
+            >
               <div class="card-header border-0 pt-4 px-4 bg-transparent">
                 <h4 class="mb-0 fw-bold harmony-text-gradient">
-                  <i class="bi bi-wallet2 me-2 harmony-text-accent1"></i>Wallet Balances
+                  <i class="bi bi-wallet2 me-2 harmony-text-accent1"></i>Wallet
+                  Balances
                 </h4>
               </div>
               <div class="card-body p-4">
-                <div v-if="walletBalanceCards.length === 0" class="text-center py-4">
-                  <i class="bi bi-wallet2 fs-2 mb-2 d-block harmony-text-muted"></i>
+                <div
+                  v-if="walletBalanceCards.length === 0"
+                  class="text-center py-4"
+                >
+                  <i
+                    class="bi bi-wallet2 fs-2 mb-2 d-block harmony-text-muted"
+                  ></i>
                   <p class="harmony-text-muted mb-0">No wallet balances yet</p>
                 </div>
                 <div v-else class="row g-3">
-                  <div v-for="(wallet, index) in walletBalanceCards" :key="wallet.wallet" class="col-md-6 col-xl-4">
-                    <div class="wallet-balance-tile" :class="`harmony-border-${getWalletColor(index)}`">
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-semibold harmony-text-dark">{{ wallet.wallet }}</span>
-                        <span class="badge harmony-badge" :class="`harmony-bg-${getWalletColor(index)}`">Balance</span>
+                  <div
+                    v-for="(wallet, index) in walletBalanceCards"
+                    :key="wallet.wallet"
+                    class="col-md-6 col-xl-4"
+                  >
+                    <div
+                      class="wallet-balance-tile"
+                      :class="`harmony-border-${getWalletColor(index)}`"
+                    >
+                      <div
+                        class="d-flex justify-content-between align-items-center mb-2"
+                      >
+                        <span class="fw-semibold harmony-text-dark">{{
+                          wallet.wallet
+                        }}</span>
+                        <span
+                          class="badge harmony-badge"
+                          :class="`harmony-bg-${getWalletColor(index)}`"
+                          >Balance</span
+                        >
                       </div>
-                      <div class="wallet-balance-amount"
-                        :class="wallet.balance >= 0 ? 'harmony-text-accent1' : 'harmony-text-expense'">
+                      <div
+                        class="wallet-balance-amount"
+                        :class="
+                          wallet.balance >= 0
+                            ? 'harmony-text-accent1'
+                            : 'harmony-text-expense'
+                        "
+                      >
                         {{ formatCurrency(wallet.balance) }}
                       </div>
-                      <div class="d-flex justify-content-between small harmony-text-muted mt-2">
+                      <div
+                        class="d-flex justify-content-between small harmony-text-muted mt-2"
+                      >
                         <span>Income</span>
-                        <span class="harmony-text-accent1">+{{ formatCurrency(wallet.income) }}</span>
+                        <span class="harmony-text-accent1"
+                          >+{{ formatCurrency(wallet.income) }}</span
+                        >
                       </div>
-                      <div class="d-flex justify-content-between small harmony-text-muted">
+                      <div
+                        class="d-flex justify-content-between small harmony-text-muted"
+                      >
                         <span>Expense</span>
-                        <span class="harmony-text-expense">-{{ formatCurrency(wallet.expense) }}</span>
+                        <span class="harmony-text-expense"
+                          >-{{ formatCurrency(wallet.expense) }}</span
+                        >
                       </div>
                     </div>
                   </div>
@@ -531,15 +1086,23 @@
     <!-- Toast Notifications -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
       <transition-group name="toast">
-        <div v-for="toast in toasts" :key="toast.id"
+        <div
+          v-for="toast in toasts"
+          :key="toast.id"
           class="toast show align-items-center text-white border-0 mb-2 harmony-toast"
-          :class="`harmony-bg-${toast.harmonyType}`" role="alert">
+          :class="`harmony-bg-${toast.harmonyType}`"
+          role="alert"
+        >
           <div class="d-flex">
             <div class="toast-body">
               <i :class="`bi ${toast.icon} me-2`"></i>
               {{ toast.message }}
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" @click="removeToast(toast.id)"></button>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              @click="removeToast(toast.id)"
+            ></button>
           </div>
         </div>
       </transition-group>
@@ -551,38 +1114,38 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import api from './services/api'
-import AuthService from './services/auth'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
+import api from "./services/api";
+import AuthService from "./services/auth";
 
-const mounted = ref(false)
-const isSubmitting = ref(false)
-const activeField = ref(null)
-const transactionType = ref('expense') // 'expense' or 'income'
-const headerText = ref('')
-const fullHeaderText = 'Daily Expense Tracker'
-const toasts = ref([])
-const confettiCanvas = ref(null)
-const searchQuery = ref('')
-const typeFilter = ref('all')
-const categoryFilter = ref('all')
-const walletFilter = ref('all')
-const currentPage = ref(1)
-const itemsPerPage = ref(5)
-const validationErrors = ref({})
-const isProduction = AuthService.isProduction()
-const isAuthLoading = ref(true)
-const isAuthSubmitting = ref(false)
-const currentUser = ref(null)
-const authMode = ref('login')
-const authError = ref('')
+const mounted = ref(false);
+const isSubmitting = ref(false);
+const activeField = ref(null);
+const transactionType = ref("expense"); // 'expense' or 'income' or 'transfer'
+const headerText = ref("");
+const fullHeaderText = "Daily Expense Tracker";
+const toasts = ref([]);
+const confettiCanvas = ref(null);
+const searchQuery = ref("");
+const typeFilter = ref("all");
+const categoryFilter = ref("all");
+const walletFilter = ref("all");
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
+const validationErrors = ref({});
+const isProduction = AuthService.isProduction();
+const isAuthLoading = ref(true);
+const isAuthSubmitting = ref(false);
+const currentUser = ref(null);
+const authMode = ref("login");
+const authError = ref("");
 const authForm = ref({
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
-let unsubscribeAuth = null
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+});
+let unsubscribeAuth = null;
 
 // Harmony Color Palette
 // Primary: Teal (#0D9488) - Main brand color
@@ -593,582 +1156,730 @@ let unsubscribeAuth = null
 // Accent3: Rose (#F43F5E) - Expense/Negative
 
 const harmonyColors = {
-  'Food': 'primary',
-  'Transport': 'secondary',
-  'Shopping': 'tertiary',
-  'Entertainment': 'accent2',
-  'Bills': 'neutral',
-  'Health': 'accent1',
-  'Other': 'muted',
-  'Salary': 'accent2',
-  'Bonus': 'accent2',
-  'Send Transfer': 'accent3',
-  'Get Transfer': 'accent1'
-}
+  Food: "primary",
+  Transport: "secondary",
+  Shopping: "tertiary",
+  Entertainment: "accent2",
+  Bills: "neutral",
+  Health: "accent1",
+  Other: "muted",
+  Salary: "accent2",
+  Bonus: "accent2",
+  "Send Transfer": "accent3",
+  "Get Transfer": "accent1",
+};
 
-const transactions = ref([])
-const walletOptions = ['Cash Bogi', 'Cash Siwi', 'BCA Bogi (36)', 'BCA Siwi (44)', 'Mandiri Siwi']
+const transactions = ref([]);
+const walletOptions = [
+  "Cash Bogi",
+  "Cash Siwi",
+  "BCA Bogi (36)",
+  "BCA Siwi (44)",
+  "Mandiri Siwi",
+];
 
 const newTransaction = ref({
-  description: '',
-  amount: '',
-  category: '',
-  wallet: '',
-  transaction_date: new Date().toISOString().split('T')[0],
-  expense_income: 'expense'
-})
+  description: "",
+  amount: "",
+  admin_fee: "",
+  category: "",
+  wallet: "",
+  transfer_to_wallet: "",
+  transaction_date: new Date().toISOString().split("T")[0],
+  expense_income: "expense",
+});
 
-// Toggle between expense and income
-const toggleTransactionType = () => {
-  transactionType.value = transactionType.value === 'expense' ? 'income' : 'expense'
-  newTransaction.value.expense_income = transactionType.value
-  newTransaction.value.category = '' // Reset category when switching
-}
+const setTransactionType = (type) => {
+  if (!["expense", "income", "transfer"].includes(type)) return;
+  transactionType.value = type;
+  newTransaction.value.expense_income = transactionType.value;
+  newTransaction.value.category = ""; // Reset category when switching
+  validationErrors.value = {};
+  if (type !== "transfer") {
+    newTransaction.value.transfer_to_wallet = "";
+    newTransaction.value.admin_fee = "";
+  }
+};
 
 const resetTrackerState = () => {
-  mounted.value = false
-  headerText.value = ''
-  transactions.value = []
-  toasts.value = []
-}
+  mounted.value = false;
+  headerText.value = "";
+  transactions.value = [];
+  toasts.value = [];
+};
 
 const initializeTracker = async () => {
   try {
-    const fetchTransactions = await api.getTransactions()
-    transactions.value = fetchTransactions.data || []
+    const fetchTransactions = await api.getTransactions();
+    transactions.value = fetchTransactions.data || [];
   } catch (error) {
-    if (error?.code === 'permission-denied' || String(error?.message || '').includes('Missing or insufficient permissions')) {
-      showToast('Firebase permission denied. Update Firestore rules for expenses collection.', 'danger', 'bi-shield-exclamation')
+    if (
+      error?.code === "permission-denied" ||
+      String(error?.message || "").includes(
+        "Missing or insufficient permissions",
+      )
+    ) {
+      showToast(
+        "Firebase permission denied. Update Firestore rules for expenses collection.",
+        "danger",
+        "bi-shield-exclamation",
+      );
     }
-    console.error('Failed to fetch expenses:', error)
+    console.error("Failed to fetch expenses:", error);
   }
 
   setTimeout(() => {
-    mounted.value = true
-    if (!headerText.value) typeWriter()
-    animateCounters()
-    animateProgressBars()
-  }, 100)
-}
+    mounted.value = true;
+    if (!headerText.value) typeWriter();
+    animateCounters();
+    animateProgressBars();
+  }, 100);
+};
 
 const mapAuthError = (error) => {
-  const message = String(error?.message || 'Authentication failed')
-  if (message.includes('auth/email-already-in-use')) return 'Email already exists.'
-  if (message.includes('auth/invalid-credential')) return 'Invalid email or password.'
-  if (message.includes('auth/invalid-email')) return 'Invalid email format.'
-  if (message.includes('auth/weak-password')) return 'Password should be at least 6 characters.'
-  return message
-}
+  const message = String(error?.message || "Authentication failed");
+  if (message.includes("auth/email-already-in-use"))
+    return "Email already exists.";
+  if (message.includes("auth/invalid-credential"))
+    return "Invalid email or password.";
+  if (message.includes("auth/invalid-email")) return "Invalid email format.";
+  if (message.includes("auth/weak-password"))
+    return "Password should be at least 6 characters.";
+  return message;
+};
 
 const handleAuthSubmit = async () => {
-  authError.value = ''
+  authError.value = "";
 
   if (!authForm.value.email || !authForm.value.password) {
-    authError.value = 'Email and password are required.'
-    return
+    authError.value = "Email and password are required.";
+    return;
   }
 
-  if (authMode.value === 'register') {
+  if (authMode.value === "register") {
     if (authForm.value.password.length < 6) {
-      authError.value = 'Password should be at least 6 characters.'
-      return
+      authError.value = "Password should be at least 6 characters.";
+      return;
     }
     if (authForm.value.password !== authForm.value.confirmPassword) {
-      authError.value = 'Passwords do not match.'
-      return
+      authError.value = "Passwords do not match.";
+      return;
     }
   }
 
-  isAuthSubmitting.value = true
+  isAuthSubmitting.value = true;
 
   try {
-    if (authMode.value === 'login') {
+    if (authMode.value === "login") {
       const user = await AuthService.login({
         email: authForm.value.email,
-        password: authForm.value.password
-      })
+        password: authForm.value.password,
+      });
       if (!isProduction) {
-        currentUser.value = user
-        await initializeTracker()
+        currentUser.value = user;
+        await initializeTracker();
       }
     } else {
       const user = await AuthService.register({
         name: authForm.value.name,
         email: authForm.value.email,
-        password: authForm.value.password
-      })
+        password: authForm.value.password,
+      });
       if (!isProduction) {
-        currentUser.value = user
-        await initializeTracker()
+        currentUser.value = user;
+        await initializeTracker();
       }
     }
 
     authForm.value = {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    }
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
   } catch (error) {
-    authError.value = mapAuthError(error)
+    authError.value = mapAuthError(error);
   } finally {
-    isAuthSubmitting.value = false
+    isAuthSubmitting.value = false;
   }
-}
+};
 
 const handleLogout = async () => {
-  await AuthService.logout()
+  await AuthService.logout();
   if (!isProduction) {
-    currentUser.value = null
-    resetTrackerState()
+    currentUser.value = null;
+    resetTrackerState();
   }
-}
+};
 
 onMounted(() => {
   unsubscribeAuth = AuthService.onAuthStateChange(async (user) => {
-    currentUser.value = user
+    currentUser.value = user;
     if (user) {
-      await initializeTracker()
+      await initializeTracker();
     } else {
-      resetTrackerState()
+      resetTrackerState();
     }
-    isAuthLoading.value = false
-  })
-})
+    isAuthLoading.value = false;
+  });
+});
 
 onUnmounted(() => {
-  if (typeof unsubscribeAuth === 'function') {
-    unsubscribeAuth()
+  if (typeof unsubscribeAuth === "function") {
+    unsubscribeAuth();
   }
-})
+});
 
 const typeWriter = () => {
-  let i = 0
+  let i = 0;
   const interval = setInterval(() => {
     if (i < fullHeaderText.length) {
-      headerText.value += fullHeaderText.charAt(i)
-      i++
+      headerText.value += fullHeaderText.charAt(i);
+      i++;
     } else {
-      clearInterval(interval)
+      clearInterval(interval);
     }
-  }, 100)
-}
+  }, 100);
+};
 
 const animateCounters = () => {
   nextTick(() => {
-    document.querySelectorAll('.counter').forEach(counter => {
-      const target = parseFloat(counter.getAttribute('data-target')) || 0
-      const duration = 2000
-      const increment = target / (duration / 16)
-      let current = 0
+    document.querySelectorAll(".counter").forEach((counter) => {
+      const target = parseFloat(counter.getAttribute("data-target")) || 0;
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
 
       const formatNumber = (num) => {
         if (num >= 1000000) {
-          return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt'
+          return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "jt";
         } else if (num >= 1000) {
-          return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+          return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
         }
-        return num.toFixed(0)
-      }
+        return num.toFixed(0);
+      };
 
       const updateCounter = () => {
-        current += increment
+        current += increment;
         if (current < target) {
-          counter.textContent = 'Rp ' + formatNumber(current)
-          requestAnimationFrame(updateCounter)
+          counter.textContent = "Rp " + formatNumber(current);
+          requestAnimationFrame(updateCounter);
         } else {
-          counter.textContent = 'Rp ' + formatNumber(target)
+          counter.textContent = "Rp " + formatNumber(target);
         }
-      }
+      };
 
-      updateCounter()
-    })
-    document.querySelectorAll('.counter-transactions').forEach(counter => {
-      const target = parseFloat(counter.getAttribute('data-target')) || 0
-      const duration = 2000
-      const increment = target / (duration / 16)
-      let current = 0
+      updateCounter();
+    });
+    document.querySelectorAll(".counter-transactions").forEach((counter) => {
+      const target = parseFloat(counter.getAttribute("data-target")) || 0;
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
 
       const updateCounter = () => {
-        current += increment
+        current += increment;
         if (current < target) {
-          counter.textContent = current.toFixed(0)
-          requestAnimationFrame(updateCounter)
+          counter.textContent = current.toFixed(0);
+          requestAnimationFrame(updateCounter);
         } else {
-          counter.textContent = target.toFixed(0)
+          counter.textContent = target.toFixed(0);
         }
-      }
-      updateCounter()
-    })
-  })
-}
+      };
+      updateCounter();
+    });
+  });
+};
 
 const animateProgressBars = () => {
   nextTick(() => {
     setTimeout(() => {
-      document.querySelectorAll('.progress-bar').forEach(bar => {
-        const width = bar.getAttribute('data-width')
-        if (width) bar.style.width = width
-      })
-    }, 500)
-  })
-}
+      document.querySelectorAll(".progress-bar").forEach((bar) => {
+        const width = bar.getAttribute("data-width");
+        if (width) bar.style.width = width;
+      });
+    }, 500);
+  });
+};
 
 const sortedTransactions = computed(() => {
   return [...transactions.value].sort(
-    (a, b) => new Date(b.transaction_date || b.date) - new Date(a.transaction_date || a.date)
-  )
-})
+    (a, b) =>
+      new Date(b.transaction_date || b.date) -
+      new Date(a.transaction_date || a.date),
+  );
+});
 
 const categoryFilterOptions = computed(() => {
-  const categories = new Set(sortedTransactions.value.map(e => e.category).filter(Boolean))
-  return Array.from(categories)
-})
+  const categories = new Set(
+    sortedTransactions.value.map((e) => e.category).filter(Boolean),
+  );
+  return Array.from(categories);
+});
 
 const walletFilterOptions = computed(() => {
   const wallets = new Set([
     ...walletOptions,
-    ...sortedTransactions.value.map(e => e.wallet).filter(Boolean)
-  ])
-  return Array.from(wallets)
-})
+    ...sortedTransactions.value.map((e) => e.wallet).filter(Boolean),
+  ]);
+  return Array.from(wallets);
+});
 
 const walletBalanceCards = computed(() => {
   const wallets = new Set([
     ...walletOptions,
-    ...transactions.value.map(e => e.wallet).filter(Boolean)
-  ])
+    ...transactions.value.map((e) => e.wallet).filter(Boolean),
+  ]);
 
-  if (transactions.value.some(e => !e.wallet)) {
-    wallets.add('Cash')
+  if (transactions.value.some((e) => !e.wallet)) {
+    wallets.add("Cash");
   }
 
-  const totals = {}
-  wallets.forEach(wallet => {
-    totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 }
-  })
+  const totals = {};
+  wallets.forEach((wallet) => {
+    totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 };
+  });
 
-  transactions.value.forEach(transaction => {
-    const wallet = transaction.wallet || 'Cash'
-    const amount = parseFloat(transaction.amount) || 0
-    if (!totals[wallet]) totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 }
+  transactions.value.forEach((transaction) => {
+    const wallet = transaction.wallet || "Cash";
+    const amount = parseFloat(transaction.amount) || 0;
+    if (!totals[wallet])
+      totals[wallet] = { wallet, income: 0, expense: 0, balance: 0 };
 
-    if (transaction.expense_income === 'Income') totals[wallet].income += amount
-    if (transaction.expense_income === 'Expense') totals[wallet].expense += amount
-  })
+    if (transaction.expense_income === "Income")
+      totals[wallet].income += amount;
+    if (transaction.expense_income === "Expense")
+      totals[wallet].expense += amount;
+  });
 
   return Object.values(totals)
-    .map(entry => ({
+    .map((entry) => ({
       ...entry,
-      balance: entry.income - entry.expense
+      balance: entry.income - entry.expense,
     }))
-    .sort((a, b) => a.wallet.localeCompare(b.wallet))
-})
+    .sort((a, b) => a.wallet.localeCompare(b.wallet));
+});
 
 const filteredTransactions = computed(() => {
-  const query = searchQuery.value.toLowerCase()
+  const query = searchQuery.value.toLowerCase();
 
-  return sortedTransactions.value.filter(e => {
-    const matchesType = typeFilter.value === 'all' || e.expense_income === typeFilter.value
-    const matchesCategory = categoryFilter.value === 'all' || e.category === categoryFilter.value
-    const matchesWallet = walletFilter.value === 'all' || (e.wallet || 'Cash') === walletFilter.value
-    const matchesSearch = !query || `${e.description || ''} ${e.category || ''} ${e.wallet || 'Cash'} ${e.expense_income || ''}`
-      .toLowerCase()
-      .includes(query)
-    return matchesType && matchesCategory && matchesWallet && matchesSearch
-  })
-})
+  return sortedTransactions.value.filter((e) => {
+    const matchesType =
+      typeFilter.value === "all" || e.expense_income === typeFilter.value;
+    const matchesCategory =
+      categoryFilter.value === "all" || e.category === categoryFilter.value;
+    const matchesWallet =
+      walletFilter.value === "all" ||
+      (e.wallet || "Cash") === walletFilter.value;
+    const matchesSearch =
+      !query ||
+      `${e.description || ""} ${e.category || ""} ${e.wallet || "Cash"} ${e.expense_income || ""}`
+        .toLowerCase()
+        .includes(query);
+    return matchesType && matchesCategory && matchesWallet && matchesSearch;
+  });
+});
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredTransactions.value.length / itemsPerPage.value)))
+const totalPages = computed(() =>
+  Math.max(
+    1,
+    Math.ceil(filteredTransactions.value.length / itemsPerPage.value),
+  ),
+);
 
 const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  return filteredTransactions.value.slice(start, start + itemsPerPage.value)
-})
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return filteredTransactions.value.slice(start, start + itemsPerPage.value);
+});
 
-const paginationStart = computed(() => (
-  filteredTransactions.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage.value + 1
-))
+const paginationStart = computed(() =>
+  filteredTransactions.value.length === 0
+    ? 0
+    : (currentPage.value - 1) * itemsPerPage.value + 1,
+);
 
-const paginationEnd = computed(() => Math.min(currentPage.value * itemsPerPage.value, filteredTransactions.value.length))
+const paginationEnd = computed(() =>
+  Math.min(
+    currentPage.value * itemsPerPage.value,
+    filteredTransactions.value.length,
+  ),
+);
 
 const visiblePageNumbers = computed(() => {
-  const maxButtons = 5
-  let start = Math.max(1, currentPage.value - 2)
-  let end = Math.min(totalPages.value, start + maxButtons - 1)
-  start = Math.max(1, end - maxButtons + 1)
+  const maxButtons = 5;
+  let start = Math.max(1, currentPage.value - 2);
+  let end = Math.min(totalPages.value, start + maxButtons - 1);
+  start = Math.max(1, end - maxButtons + 1);
 
-  const pages = []
-  for (let page = start; page <= end; page++) pages.push(page)
-  return pages
-})
+  const pages = [];
+  for (let page = start; page <= end; page++) pages.push(page);
+  return pages;
+});
 
-watch([searchQuery, typeFilter, categoryFilter, walletFilter, itemsPerPage], () => {
-  currentPage.value = 1
-})
+watch(
+  [searchQuery, typeFilter, categoryFilter, walletFilter, itemsPerPage],
+  () => {
+    currentPage.value = 1;
+  },
+);
 
-watch(filteredTransactions, () => {
-  if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
-}, { immediate: true })
+watch(
+  filteredTransactions,
+  () => {
+    if (currentPage.value > totalPages.value)
+      currentPage.value = totalPages.value;
+  },
+  { immediate: true },
+);
 
 const resetTransactionFilters = () => {
-  searchQuery.value = ''
-  typeFilter.value = 'all'
-  categoryFilter.value = 'all'
-  walletFilter.value = 'all'
-}
+  searchQuery.value = "";
+  typeFilter.value = "all";
+  categoryFilter.value = "all";
+  walletFilter.value = "all";
+};
 
 const totalIncome = computed(() => {
   return transactions.value
-    .filter(e => ['Income'].includes(e.expense_income))
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
-})
+    .filter((e) => ["Income"].includes(e.expense_income))
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+});
 
 const totalTransactions = computed(() => {
   return transactions.value
-    .filter(e => ['Expense'].includes(e.expense_income))
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
-})
+    .filter((e) => ["Expense"].includes(e.expense_income))
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+});
 
-const totalBalance = computed(() => totalIncome.value - totalTransactions.value)
+const totalBalance = computed(
+  () => totalIncome.value - totalTransactions.value,
+);
 const trendBalance = computed(() => {
   const lastMonthExpenses = transactions.value
-    .filter(e => {
-      const date = new Date(e.transaction_date || e.date)
-      const now = new Date()
-      return date.getMonth() === now.getMonth() - 1 && ['Expense'].includes(e.expense_income)
+    .filter((e) => {
+      const date = new Date(e.transaction_date || e.date);
+      const now = new Date();
+      return (
+        date.getMonth() === now.getMonth() - 1 &&
+        ["Expense"].includes(e.expense_income)
+      );
     })
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
   const lastMonthIncome = transactions.value
-    .filter(e => {
-      const date = new Date(e.transaction_date || e.date)
-      const now = new Date()
-      return date.getMonth() === now.getMonth() - 1 && ['Income'].includes(e.expense_income)
+    .filter((e) => {
+      const date = new Date(e.transaction_date || e.date);
+      const now = new Date();
+      return (
+        date.getMonth() === now.getMonth() - 1 &&
+        ["Income"].includes(e.expense_income)
+      );
     })
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
-  const lastMonthBalance = lastMonthIncome - lastMonthExpenses
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
 
-  if (lastMonthBalance - totalBalance.value === 0) return '0'
-  if (lastMonthBalance === 0 && totalBalance.value > 0) return '+100' // If last month balance is 0, we consider it a 100% increase if current balance is positive
+  if (lastMonthBalance - totalBalance.value === 0) return "0";
+  if (lastMonthBalance === 0 && totalBalance.value > 0) return "+100"; // If last month balance is 0, we consider it a 100% increase if current balance is positive
 
-  const change = ((totalBalance.value - lastMonthBalance) / lastMonthBalance) * 100
-  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
-})
+  const change =
+    ((totalBalance.value - lastMonthBalance) / lastMonthBalance) * 100;
+  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`;
+});
 const trendExpenses = computed(() => {
   const currentWeekExpenses = transactions.value
-    .filter(e => {
-      const date = new Date(e.transaction_date || e.date)
-      const now = new Date()
-      const oneWeekAgo = new Date(now.setDate(now.getDate() - 7))
-      return date >= oneWeekAgo && ['Expense'].includes(e.expense_income)
+    .filter((e) => {
+      const date = new Date(e.transaction_date || e.date);
+      const now = new Date();
+      const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
+      return date >= oneWeekAgo && ["Expense"].includes(e.expense_income);
     })
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
-  const now = new Date()
-  const oneWeekAgo = new Date(now)
-  oneWeekAgo.setDate(now.getDate() - 7)
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  const now = new Date();
+  const oneWeekAgo = new Date(now);
+  oneWeekAgo.setDate(now.getDate() - 7);
 
-  const twoWeekAgo = new Date(now)
-  twoWeekAgo.setDate(now.getDate() - 14)
+  const twoWeekAgo = new Date(now);
+  twoWeekAgo.setDate(now.getDate() - 14);
 
-  const lastWeekExpenses = transactions.value.filter(e => {
-    const date = new Date(e.transaction_date)
-    return (
-      date >= twoWeekAgo &&
-      date < oneWeekAgo &&
-      e.expense_income === 'Expense'
-    )
-  })
-    .reduce((sum, e) => sum + parseFloat(e.amount), 0)
+  const lastWeekExpenses = transactions.value
+    .filter((e) => {
+      const date = new Date(e.transaction_date);
+      return (
+        date >= twoWeekAgo &&
+        date < oneWeekAgo &&
+        e.expense_income === "Expense"
+      );
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount), 0);
 
-  if (currentWeekExpenses - lastWeekExpenses === 0) return '0'
-  if (lastWeekExpenses === 0 && currentWeekExpenses > 0) return '+100' // If last week expenses is 0, we consider it a 100% increase if current expenses is positive)
+  if (currentWeekExpenses - lastWeekExpenses === 0) return "0";
+  if (lastWeekExpenses === 0 && currentWeekExpenses > 0) return "+100"; // If last week expenses is 0, we consider it a 100% increase if current expenses is positive)
 
-  const change = ((currentWeekExpenses - lastWeekExpenses) / lastWeekExpenses) * 100
-  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`
-})
+  const change =
+    ((currentWeekExpenses - lastWeekExpenses) / lastWeekExpenses) * 100;
+  return change >= 0 ? `+${change.toFixed(1)}` : `${change.toFixed(1)}`;
+});
 
 const categoryTotals = computed(() => {
-  const totals = {}
-  transactions.value.forEach(e => {
+  const totals = {};
+  transactions.value.forEach((e) => {
     totals[e.category] = (totals[e.category] || 0) + parseFloat(e.amount);
-  })
-  return totals
-})
+  });
+  return totals;
+});
 
 const summaryCards = computed(() => [
   {
-    type: 'balance',
-    title: 'Total Balance',
+    type: "balance",
+    title: "Total Balance",
     value: totalBalance.value,
-    harmonyColor: 'accent1',
-    icon: 'bi-wallet',
-    trend: trendBalance.value + '% vs last month',
-    trendIcon: trendBalance.value >= 0 ? 'bi-arrow-up' : 'bi-arrow-down',
-    trendColor: 'accent1'
+    harmonyColor: "accent1",
+    icon: "bi-wallet",
+    trend: trendBalance.value + "% vs last month",
+    trendIcon: trendBalance.value >= 0 ? "bi-arrow-up" : "bi-arrow-down",
+    trendColor: "accent1",
   },
   {
-    type: 'expenses',
-    title: 'Total Expenses',
+    type: "expenses",
+    title: "Total Expenses",
     value: totalTransactions.value,
-    harmonyColor: 'expense',
-    icon: 'bi-graph-down-arrow',
-    trend: trendExpenses.value + '% vs last week',
-    trendIcon: trendExpenses.value >= 0 ? 'bi-arrow-up' : 'bi-arrow-down',
-    trendColor: 'expense'
+    harmonyColor: "expense",
+    icon: "bi-graph-down-arrow",
+    trend: trendExpenses.value + "% vs last week",
+    trendIcon: trendExpenses.value >= 0 ? "bi-arrow-up" : "bi-arrow-down",
+    trendColor: "expense",
   },
   {
-    type: 'transactions',
-    title: 'Transactions',
+    type: "transactions",
+    title: "Transactions",
     value: transactions.value.length,
-    harmonyColor: 'secondary',
-    icon: 'bi-receipt',
+    harmonyColor: "secondary",
+    icon: "bi-receipt",
     trend: null,
     trendIcon: null,
-    trendColor: null
-  }
-])
+    trendColor: null,
+  },
+]);
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 2
-  }).format(amount)
-}
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
 
 const getWalletColor = (index) => {
-  const colors = ['primary', 'secondary', 'tertiary', 'accent1', 'accent2']
-  return colors[index % colors.length]
-}
+  const colors = ["primary", "secondary", "tertiary", "accent1", "accent2"];
+  return colors[index % colors.length];
+};
 
 const validateTransaction = () => {
-  const errors = {}
-  const description = (newTransaction.value.description || '').trim()
-  const amount = newTransaction.value.amount
-  const category = (newTransaction.value.category || '').trim()
-  const wallet = (newTransaction.value.wallet || '').trim()
+  const errors = {};
+  const description = (newTransaction.value.description || "").trim();
+  const amount = newTransaction.value.amount;
+  const category = (newTransaction.value.category || "").trim();
+  const wallet = (newTransaction.value.wallet || "").trim();
+  const transferToWallet = (
+    newTransaction.value.transfer_to_wallet || ""
+  ).trim();
+  const adminFee = newTransaction.value.admin_fee;
 
-  if (!description) errors.description = 'Description is required.'
-  if (!category) errors.category = 'Category is required.'
-  if (amount === '' || amount === null || Number.isNaN(Number(amount))) {
-    errors.amount = 'Amount is required.'
+  if (!description) errors.description = "Description is required.";
+  if (transactionType.value !== "transfer" && !category)
+    errors.category = "Category is required.";
+  if (amount === "" || amount === null || Number.isNaN(Number(amount))) {
+    errors.amount = "Amount is required.";
   }
-  if (!wallet) errors.wallet = 'Wallet is required.'
-  if (!['expense', 'income'].includes(transactionType.value)) {
-    errors.transactionType = 'Transaction type is required.'
+  if (Number(amount) <= 0) errors.amount = "Amount must be greater than zero.";
+  if (!wallet) errors.wallet = "Wallet is required.";
+  if (transactionType.value === "transfer" && !transferToWallet) {
+    errors.transfer_to_wallet = "Destination wallet is required.";
+  }
+  if (
+    transactionType.value === "transfer" &&
+    wallet &&
+    transferToWallet &&
+    wallet === transferToWallet
+  ) {
+    errors.transfer_to_wallet =
+      "Source and destination wallet must be different.";
+  }
+  if (
+    transactionType.value === "transfer" &&
+    adminFee !== "" &&
+    adminFee !== null &&
+    Number.isNaN(Number(adminFee))
+  ) {
+    errors.admin_fee = "Admin fee must be a number.";
+  }
+  if (transactionType.value === "transfer" && Number(adminFee || 0) < 0) {
+    errors.admin_fee = "Admin fee cannot be negative.";
+  }
+  if (!["expense", "income", "transfer"].includes(transactionType.value)) {
+    errors.transactionType = "Transaction type is required.";
   }
 
-  validationErrors.value = errors
-  return Object.keys(errors).length === 0
-}
+  validationErrors.value = errors;
+  return Object.keys(errors).length === 0;
+};
 
 // Add transaction
 const addTransaction = async () => {
   if (!validateTransaction()) {
-    showToast('Please fill in all required fields.', 'danger', 'bi-exclamation-triangle')
-    return
+    showToast(
+      "Please fill in all required fields.",
+      "danger",
+      "bi-exclamation-triangle",
+    );
+    return;
   }
 
-  isSubmitting.value = true
+  isSubmitting.value = true;
 
-  await new Promise(resolve => setTimeout(resolve, 600))
+  await new Promise((resolve) => setTimeout(resolve, 600));
 
-  const transaction = {
-    ...newTransaction.value,
-    expense_income: transactionType.value === 'expense'
-      ? "Expense"
-      : "Income"
+  if (transactionType.value === "transfer") {
+    const description = (newTransaction.value.description || "").trim();
+    const amount = Number(newTransaction.value.amount);
+    const adminFee = Number(newTransaction.value.admin_fee || 0);
+    const senderAmount = amount + adminFee;
+    const fromWallet = newTransaction.value.wallet;
+    const toWallet = newTransaction.value.transfer_to_wallet;
+    const transferDate = newTransaction.value.transaction_date;
+    const suffix = description ? ` - ${description}` : "";
+
+    const transferOutTransaction = {
+      description: `Transfer to ${toWallet}${suffix}${adminFee > 0 ? ` (Admin Fee: ${formatCurrency(adminFee)})` : ""}`,
+      amount: senderAmount,
+      category: "Send Transfer",
+      wallet: fromWallet,
+      transaction_date: transferDate,
+      transfer_amount: amount,
+      admin_fee: adminFee,
+      expense_income: "Expense",
+    };
+
+    const transferInTransaction = {
+      description: `Transfer from ${fromWallet}${suffix}`,
+      amount,
+      category: "Get Transfer",
+      wallet: toWallet,
+      transaction_date: transferDate,
+      expense_income: "Income",
+    };
+
+    const [createdOut, createdIn] = await Promise.all([
+      api.createTransaction(transferOutTransaction),
+      api.createTransaction(transferInTransaction),
+    ]);
+
+    transactions.value.push(createdOut?.data || transferOutTransaction);
+    transactions.value.push(createdIn?.data || transferInTransaction);
+    showToast("Transfer completed successfully!", "success", "bi-check-circle");
+  } else {
+    const transaction = {
+      ...newTransaction.value,
+      admin_fee: undefined,
+      transfer_to_wallet: undefined,
+      expense_income:
+        transactionType.value === "expense" ? "Expense" : "Income",
+    };
+
+    const created = await api.createTransaction(transaction);
+    showToast(
+      `${transaction.expense_income} added successfully!`,
+      "success",
+      "bi-check-circle",
+    );
+    transactions.value.push(created?.data || transaction);
   }
-
-  // Add to your expenses array (replace with API call)
-  const created = await api.createTransaction(transaction)
-  showToast('Expense added successfully!', 'success', 'bi-check-circle')
-  triggerConfetti()
-  transactions.value.push(created?.data || transaction)
+  triggerConfetti();
 
   // Reset form
   newTransaction.value = {
-    description: '',
-    amount: '',
-    category: '',
-    wallet: 'Cash Bogi',
-    transaction_date: new Date().toISOString().split('T')[0],
-    expense_income: transactionType.value
-  }
-  validationErrors.value = {}
+    description: "",
+    amount: "",
+    admin_fee: "",
+    category: "",
+    wallet: "",
+    transfer_to_wallet: "",
+    transaction_date: new Date().toISOString().split("T")[0],
+    expense_income: transactionType.value,
+  };
+  validationErrors.value = {};
 
   nextTick(() => {
-    animateCounters()
-    animateProgressBars()
-  })
+    animateCounters();
+    animateProgressBars();
+  });
 
-  isSubmitting.value = false
-}
+  isSubmitting.value = false;
+};
 
 const deleteTransaction = async (id) => {
-  await api.deleteTransaction(id)
-  transactions.value = transactions.value.filter(e => e.id !== id)
-  showToast('Expense deleted', 'danger', 'bi-trash')
-  animateCounters()
-}
+  await api.deleteTransaction(id);
+  transactions.value = transactions.value.filter((e) => e.id !== id);
+  showToast("Expense deleted", "danger", "bi-trash");
+  animateCounters();
+};
 
 const confirmClear = () => {
-  if (confirm('Are you sure you want to clear all expenses?')) {
-    transactions.value = []
-    saveExpenses()
-    showToast('All expenses cleared', 'warning', 'bi-exclamation-triangle')
+  if (confirm("Are you sure you want to clear all expenses?")) {
+    transactions.value = [];
+    saveExpenses();
+    showToast("All expenses cleared", "warning", "bi-exclamation-triangle");
   }
-}
+};
 
 const exportData = () => {
-  const dataStr = JSON.stringify(transactions.value, null, 2)
-  const blob = new Blob([dataStr], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'expenses.json'
-  a.click()
-  showToast('Data exported!', 'info', 'bi-download')
-}
+  const dataStr = JSON.stringify(transactions.value, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "expenses.json";
+  a.click();
+  showToast("Data exported!", "info", "bi-download");
+};
 
 const saveExpenses = () => {
-  localStorage.setItem('expenses', JSON.stringify(transactions.value))
-}
+  localStorage.setItem("expenses", JSON.stringify(transactions.value));
+};
 
 const showToast = (message, type, icon) => {
   const harmonyTypeMap = {
-    'success': 'accent1',
-    'danger': 'expense',
-    'warning': 'accent2',
-    'info': 'secondary'
-  }
+    success: "accent1",
+    danger: "expense",
+    warning: "accent2",
+    info: "secondary",
+  };
 
-  const id = Date.now()
+  const id = Date.now();
   toasts.value.push({
     id,
     message,
     type,
     icon,
-    harmonyType: harmonyTypeMap[type] || 'primary'
-  })
-  setTimeout(() => removeToast(id), 3000)
-}
+    harmonyType: harmonyTypeMap[type] || "primary",
+  });
+  setTimeout(() => removeToast(id), 3000);
+};
 
 const removeToast = (id) => {
-  toasts.value = toasts.value.filter(t => t.id !== id)
-}
+  toasts.value = toasts.value.filter((t) => t.id !== id);
+};
 
 const triggerConfetti = () => {
-  const canvas = confettiCanvas.value
-  if (!canvas) return
+  const canvas = confettiCanvas.value;
+  if (!canvas) return;
 
-  const ctx = canvas.getContext('2d')
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-  const particles = []
+  const particles = [];
   // Harmony color palette for confetti
-  const colors = ['#0D9488', '#06B6D4', '#3B82F6', '#10B981', '#8B5CF6']
+  const colors = ["#0D9488", "#06B6D4", "#3B82F6", "#10B981", "#8B5CF6"];
 
   for (let i = 0; i < 50; i++) {
     particles.push({
@@ -1178,57 +1889,62 @@ const triggerConfetti = () => {
       vy: (Math.random() - 0.5) * 10 - 5,
       color: colors[Math.floor(Math.random() * colors.length)],
       size: Math.random() * 5 + 2,
-      life: 1
-    })
+      life: 1,
+    });
   }
 
   const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    let active = false
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let active = false;
 
-    particles.forEach(p => {
+    particles.forEach((p) => {
       if (p.life > 0) {
-        active = true
-        p.x += p.vx
-        p.y += p.vy
-        p.vy += 0.2
-        p.life -= 0.02
+        active = true;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.life -= 0.02;
 
-        ctx.globalAlpha = p.life
-        ctx.fillStyle = p.color
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fill()
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
       }
-    })
+    });
 
-    if (active) requestAnimationFrame(animate)
-  }
+    if (active) requestAnimationFrame(animate);
+  };
 
-  animate()
-}
+  animate();
+};
 
-const formatDay = (dateStr) => new Date(dateStr).getDate()
-const formatMonth = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { month: 'short' })
-const formatTime = (dateStr) => new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+const formatDay = (dateStr) => new Date(dateStr).getDate();
+const formatMonth = (dateStr) =>
+  new Date(dateStr).toLocaleDateString("en-US", { month: "short" });
+const formatTime = (dateStr) =>
+  new Date(dateStr).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-const getHarmonyColor = (category) => harmonyColors[category] || 'muted'
+const getHarmonyColor = (category) => harmonyColors[category] || "muted";
 const getCategoryIcon = (category) => {
   const icons = {
-    'Food': 'bi-cup-hot',
-    'Transport': 'bi-car-front',
-    'Shopping': 'bi-bag',
-    'Entertainment': 'bi-film',
-    'Bills': 'bi-receipt',
-    'Health': 'bi-heart-pulse',
-    'Other': 'bi-box',
-    'send transfer': 'bi-arrow-up-right',
-    'Salary': 'bi-cash-stack',
-    'Bonus': 'bi-gift',
-    'Get Transfer': 'bi-arrow-down-left'
-  }
-  return icons[category] || 'bi-circle'
-}
+    Food: "bi-cup-hot",
+    Transport: "bi-car-front",
+    Shopping: "bi-bag",
+    Entertainment: "bi-film",
+    Bills: "bi-receipt",
+    Health: "bi-heart-pulse",
+    Other: "bi-box",
+    "Send Transfer": "bi-arrow-up-right",
+    Salary: "bi-cash-stack",
+    Bonus: "bi-gift",
+    "Get Transfer": "bi-arrow-down-left",
+  };
+  return icons[category] || "bi-circle";
+};
 </script>
 
 <style>
@@ -1239,76 +1955,85 @@ const getCategoryIcon = (category) => {
 
 :root {
   /* Primary Harmony Colors */
-  --harmony-primary: #0D9488;
+  --harmony-primary: #0d9488;
   /* Teal 600 */
-  --harmony-primary-light: #14B8A6;
+  --harmony-primary-light: #14b8a6;
   /* Teal 500 */
-  --harmony-primary-dark: #0F766E;
+  --harmony-primary-dark: #0f766e;
   /* Teal 700 */
-  --harmony-primary-soft: #CCFBF1;
+  --harmony-primary-soft: #ccfbf1;
   /* Teal 100 */
 
   /* Secondary (Cyan) - Adjacent on wheel */
-  --harmony-secondary: #06B6D4;
+  --harmony-secondary: #06b6d4;
   /* Cyan 500 */
-  --harmony-secondary-light: #22D3EE;
+  --harmony-secondary-light: #22d3ee;
   /* Cyan 400 */
-  --harmony-secondary-dark: #0891B2;
+  --harmony-secondary-dark: #0891b2;
   /* Cyan 600 */
-  --harmony-secondary-soft: #CFFAFE;
+  --harmony-secondary-soft: #cffafe;
   /* Cyan 100 */
 
   /* Tertiary (Blue) - Adjacent on wheel */
-  --harmony-tertiary: #3B82F6;
+  --harmony-tertiary: #3b82f6;
   /* Blue 500 */
-  --harmony-tertiary-light: #60A5FA;
+  --harmony-tertiary-light: #60a5fa;
   /* Blue 400 */
-  --harmony-tertiary-dark: #2563EB;
+  --harmony-tertiary-dark: #2563eb;
   /* Blue 600 */
-  --harmony-tertiary-soft: #DBEAFE;
+  --harmony-tertiary-soft: #dbeafe;
   /* Blue 100 */
 
   /* Accent Colors (Complementary harmony) */
-  --harmony-accent1: #10B981;
+  --harmony-accent1: #10b981;
   /* Emerald 500 - Success */
-  --harmony-accent1-soft: #D1FAE5;
+  --harmony-accent1-soft: #d1fae5;
   /* Emerald 100 */
-  --harmony-expense-soft: #FFE4E6;
+  --harmony-expense-soft: #ffe4e6;
   /* Rose 100 */
 
-  --harmony-accent2: #8B5CF6;
+  --harmony-accent2: #8b5cf6;
   /* Violet 500 - Special */
-  --harmony-accent2-soft: #EDE9FE;
+  --harmony-accent2-soft: #ede9fe;
   /* Violet 100 */
 
-  --harmony-accent3: #F59E0B;
+  --harmony-accent3: #f59e0b;
   /* Amber 500 - Warning */
 
   /* Functional Colors */
-  --harmony-expense: #F43F5E;
+  --harmony-expense: #f43f5e;
   /* Rose 500 - Expenses */
-  --harmony-expense-soft: #FFE4E6;
+  --harmony-expense-soft: #ffe4e6;
   /* Rose 100 */
 
-  --harmony-neutral: #64748B;
+  --harmony-neutral: #64748b;
   /* Slate 500 */
-  --harmony-neutral-soft: #F1F5F9;
+  --harmony-neutral-soft: #f1f5f9;
   /* Slate 100 */
 
-  --harmony-muted: #94A3B8;
+  --harmony-muted: #94a3b8;
   /* Slate 400 */
-  --harmony-light: #CBD5E1;
+  --harmony-light: #cbd5e1;
   /* Slate 300 */
 
   /* Backgrounds */
-  --harmony-bg: #F0FDFA;
+  --harmony-bg: #f0fdfa;
   /* Teal 50 */
   --harmony-card: rgba(255, 255, 255, 0.95);
 
   /* Gradients */
-  --harmony-gradient-primary: linear-gradient(135deg, #0D9488 0%, #06B6D4 100%);
-  --harmony-gradient-secondary: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
-  --harmony-gradient-full: linear-gradient(135deg, #0D9488 0%, #06B6D4 50%, #3B82F6 100%);
+  --harmony-gradient-primary: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+  --harmony-gradient-secondary: linear-gradient(
+    135deg,
+    #06b6d4 0%,
+    #3b82f6 100%
+  );
+  --harmony-gradient-full: linear-gradient(
+    135deg,
+    #0d9488 0%,
+    #06b6d4 50%,
+    #3b82f6 100%
+  );
 }
 
 /* ============================================
@@ -1400,7 +2125,7 @@ const getCategoryIcon = (category) => {
   height: 100%;
   z-index: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #F0FDFA 0%, #ECFEFF 50%, #EFF6FF 100%);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 50%, #eff6ff 100%);
 }
 
 .gradient-orb {
@@ -1440,7 +2165,6 @@ const getCategoryIcon = (category) => {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translate(0, 0) scale(1);
@@ -1500,7 +2224,7 @@ const getCategoryIcon = (category) => {
 }
 
 .harmony-text-dark {
-  color: #1E293B !important;
+  color: #1e293b !important;
 }
 
 .harmony-text-gradient {
@@ -1573,7 +2297,7 @@ const getCategoryIcon = (category) => {
 }
 
 .transaction-toggle {
-  background: #F1F5F9;
+  background: #f1f5f9;
   border-radius: 16px;
   padding: 4px;
   cursor: pointer;
@@ -1581,7 +2305,7 @@ const getCategoryIcon = (category) => {
 }
 
 .transaction-toggle:hover {
-  background: #E2E8F0;
+  background: #e2e8f0;
 }
 
 .toggle-slider {
@@ -1593,6 +2317,8 @@ const getCategoryIcon = (category) => {
 
 .toggle-option {
   flex: 1;
+  border: 0;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1602,7 +2328,7 @@ const getCategoryIcon = (category) => {
   font-size: 0.9rem;
   z-index: 2;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #64748B;
+  color: #64748b;
 }
 
 .toggle-option i {
@@ -1611,6 +2337,17 @@ const getCategoryIcon = (category) => {
 
 .toggle-option.active {
   color: white;
+}
+
+@media (max-width: 576px) {
+  .transaction-toggle .toggle-option span {
+    display: none;
+  }
+
+  .transaction-toggle .toggle-option {
+    gap: 0;
+    padding: 0.75rem 0.5rem;
+  }
 }
 
 .expense-option.active {
@@ -1625,7 +2362,7 @@ const getCategoryIcon = (category) => {
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%;
+  width: 33.3333%;
   height: 100%;
   background: var(--harmony-expense);
   border-radius: 12px;
@@ -1638,6 +2375,12 @@ const getCategoryIcon = (category) => {
   transform: translateX(100%);
   background: var(--harmony-accent1);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.transaction-toggle.transfer-active .toggle-indicator {
+  transform: translateX(200%);
+  background: var(--harmony-secondary);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
 }
 
 /* ============================================
@@ -1679,6 +2422,12 @@ const getCategoryIcon = (category) => {
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
+.transfer-badge {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--harmony-secondary);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
 /* ============================================
    AMOUNT INPUT WITH +/- INDICATOR
    ============================================ */
@@ -1706,6 +2455,10 @@ const getCategoryIcon = (category) => {
   color: var(--harmony-accent1);
 }
 
+.transfer-symbol {
+  color: var(--harmony-secondary);
+}
+
 .amount-input {
   padding-left: 2.5rem !important;
 }
@@ -1724,7 +2477,24 @@ const getCategoryIcon = (category) => {
 }
 
 .income-line {
-  background: linear-gradient(90deg, var(--harmony-accent1), var(--harmony-primary)) !important;
+  background: linear-gradient(
+    90deg,
+    var(--harmony-accent1),
+    var(--harmony-primary)
+  ) !important;
+}
+
+.transfer-input:focus {
+  border-color: var(--harmony-secondary) !important;
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1) !important;
+}
+
+.transfer-line {
+  background: linear-gradient(
+    90deg,
+    var(--harmony-secondary),
+    var(--harmony-tertiary)
+  ) !important;
 }
 
 /* ============================================
@@ -1746,7 +2516,11 @@ const getCategoryIcon = (category) => {
 }
 
 .harmony-btn-income {
-  background: linear-gradient(135deg, var(--harmony-accent1) 0%, var(--harmony-primary) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--harmony-accent1) 0%,
+    var(--harmony-primary) 100%
+  ) !important;
   border: none !important;
   color: white !important;
   position: relative;
@@ -1757,6 +2531,24 @@ const getCategoryIcon = (category) => {
 .harmony-btn-income:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4) !important;
+}
+
+.harmony-btn-transfer {
+  background: linear-gradient(
+    135deg,
+    var(--harmony-secondary) 0%,
+    var(--harmony-tertiary) 100%
+  ) !important;
+  border: none !important;
+  color: white !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.harmony-btn-transfer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(6, 182, 212, 0.35) !important;
 }
 
 /* ============================================
@@ -1796,7 +2588,6 @@ optgroup option {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -1834,7 +2625,9 @@ optgroup option {
 
 .harmony-shadow {
   box-shadow: 0 10px 40px -10px rgba(13, 148, 136, 0.2) !important;
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
 }
 
 .harmony-shadow:hover {
@@ -1927,9 +2720,9 @@ optgroup option {
 }
 
 .harmony-input {
-  border: 2px solid #E2E8F0 !important;
+  border: 2px solid #e2e8f0 !important;
   border-radius: 12px !important;
-  background: #F8FAFC !important;
+  background: #f8fafc !important;
   transition: all 0.3s !important;
 }
 
@@ -2077,7 +2870,9 @@ optgroup option {
   border-radius: 16px;
   padding: 1rem 1.1rem;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .wallet-balance-tile:hover {
@@ -2091,7 +2886,7 @@ optgroup option {
 }
 
 .harmony-table-header {
-  background: linear-gradient(135deg, #F0FDFA 0%, #ECFEFF 100%) !important;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%) !important;
 }
 
 .harmony-table-header th {
@@ -2105,7 +2900,7 @@ optgroup option {
 }
 
 .transaction-row:hover {
-  background: #F0FDFA !important;
+  background: #f0fdfa !important;
   border-left-color: var(--harmony-primary);
   transform: translateX(5px);
 }
@@ -2192,10 +2987,12 @@ optgroup option {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   animation: shimmer 3s infinite;
 }
 
@@ -2215,7 +3012,6 @@ optgroup option {
 }
 
 @keyframes bounce {
-
   0%,
   100% {
     transform: translateY(0);
@@ -2250,7 +3046,6 @@ optgroup option {
 }
 
 @keyframes blink {
-
   0%,
   50% {
     opacity: 1;
@@ -2296,7 +3091,6 @@ optgroup option {
 }
 
 @keyframes float-icon {
-
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
