@@ -7,6 +7,9 @@ const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT || import.meta.env.ENVIRONM
 const IS_PRODUCTION = ENVIRONMENT === 'production';
 const TRANSACTIONS_COLLECTION = 'transactions';
 
+const sanitizeFirestorePayload = (payload) =>
+  Object.fromEntries(Object.entries(payload).filter(([, value]) => value !== undefined));
+
 class TransactionAPI {
   static async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -88,15 +91,16 @@ class TransactionAPI {
   }
 
   const uid = auth.currentUser?.uid || 'Anonymous';
+  const payload = sanitizeFirestorePayload({
+    ...transactionData,
+    created_by: uid
+  });
   const docRef = await addDoc(
     collection(db, TRANSACTIONS_COLLECTION),
-    {
-      ...transactionData,
-      created_by: uid
-    }
+    payload
   );
 
-  return { data: { id: docRef.id, ...transactionData } };
+  return { data: { id: docRef.id, ...payload } };
 }
 
   static async updateTransaction(id, transactionData) {
@@ -108,8 +112,9 @@ class TransactionAPI {
     }
 
     const docRef = doc(db, TRANSACTIONS_COLLECTION, String(id));
-    await updateDoc(docRef, transactionData);
-    return { data: { id, ...transactionData } };
+    const payload = sanitizeFirestorePayload(transactionData);
+    await updateDoc(docRef, payload);
+    return { data: { id, ...payload } };
   }
 
   static async deleteTransaction(id) {

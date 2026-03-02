@@ -1181,7 +1181,7 @@ const walletOptions = [
 const newTransaction = ref({
   description: "",
   amount: "",
-  admin_fee: "",
+  admin_fee: "0",
   category: "",
   wallet: "",
   transfer_to_wallet: "",
@@ -1197,7 +1197,7 @@ const setTransactionType = (type) => {
   validationErrors.value = {};
   if (type !== "transfer") {
     newTransaction.value.transfer_to_wallet = "";
-    newTransaction.value.admin_fee = "";
+    newTransaction.value.admin_fee = "0";
   }
 };
 
@@ -1779,8 +1779,8 @@ const addTransaction = async () => {
   } else {
     const transaction = {
       ...newTransaction.value,
-      admin_fee: undefined,
-      transfer_to_wallet: undefined,
+      admin_fee: Number(newTransaction.value.admin_fee || 0),
+      transfer_to_wallet: newTransaction.value.transfer_to_wallet || "",
       expense_income:
         transactionType.value === "expense" ? "Expense" : "Income",
     };
@@ -1799,7 +1799,7 @@ const addTransaction = async () => {
   newTransaction.value = {
     description: "",
     amount: "",
-    admin_fee: "",
+    admin_fee: "0",
     category: "",
     wallet: "",
     transfer_to_wallet: "",
