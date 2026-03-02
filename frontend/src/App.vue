@@ -179,9 +179,12 @@
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
-                    <input v-model="newTransaction.description" type="text" class="form-control harmony-input"
-                      :class="{ 'income-input': transactionType === 'income' }" id="descInput" placeholder="Description"
-                      required @focus="activeField = 'desc'" @blur="activeField = null">
+                    <input v-model.trim="newTransaction.description" type="text" class="form-control harmony-input"
+                      :class="{
+                        'income-input': transactionType === 'income',
+                        'is-invalid': validationErrors?.description
+                      }" id="descInput" placeholder="Description" required @focus="activeField = 'desc'"
+                      @blur="activeField = null">
                     <label for="descInput" class="harmony-label">
                       <i class="bi bi-pencil me-2"
                         :class="transactionType === 'expense' ? 'harmony-text-primary' : 'harmony-text-accent1'"></i>
@@ -213,9 +216,10 @@
                   </div>
 
                   <div class="form-floating mb-3 input-group-animated">
-                    <select v-model="newTransaction.category" class="form-select harmony-input"
-                      :class="{ 'income-input': transactionType === 'income' }" id="categoryInput" required
-                      @focus="activeField = 'category'" @blur="activeField = null">
+                    <select v-model="newTransaction.category" class="form-select harmony-input" :class="{
+                      'income-input': transactionType === 'income',
+                      'is-invalid': validationErrors?.category
+                    }" id="categoryInput" required @focus="activeField = 'category'" @blur="activeField = null">
                       <option value="" disabled selected>Select category</option>
 
                       <!-- Expense Categories -->
@@ -249,9 +253,10 @@
                   </div>
 
                   <div class="form-floating mb-4 input-group-animated">
-                    <select v-model="newTransaction.wallet" class="form-select harmony-input"
-                      :class="{ 'income-input': transactionType === 'income' }" id="walletInput" required
-                      @focus="activeField = 'wallet'" @blur="activeField = null">
+                    <select v-model="newTransaction.wallet" class="form-select harmony-input" :class="{
+                      'income-input': transactionType === 'income',
+                      'is-invalid': validationErrors?.wallet
+                    }" id="walletInput" required @focus="activeField = 'wallet'" @blur="activeField = null">
                       <option value="" disabled>Select wallet</option>
                       <option v-for="wallet in walletOptions" :key="wallet" :value="wallet">
                         {{ wallet }}
@@ -608,7 +613,7 @@ const newTransaction = ref({
   description: '',
   amount: '',
   category: '',
-  wallet: 'Cash Bogi',
+  wallet: '',
   transaction_date: new Date().toISOString().split('T')[0],
   expense_income: 'expense'
 })
@@ -1036,8 +1041,34 @@ const getWalletColor = (index) => {
   return colors[index % colors.length]
 }
 
+const validateTransaction = () => {
+  const errors = {}
+  const description = (newTransaction.value.description || '').trim()
+  const amount = newTransaction.value.amount
+  const category = (newTransaction.value.category || '').trim()
+  const wallet = (newTransaction.value.wallet || '').trim()
+
+  if (!description) errors.description = 'Description is required.'
+  if (!category) errors.category = 'Category is required.'
+  if (amount === '' || amount === null || Number.isNaN(Number(amount))) {
+    errors.amount = 'Amount is required.'
+  }
+  if (!wallet) errors.wallet = 'Wallet is required.'
+  if (!['expense', 'income'].includes(transactionType.value)) {
+    errors.transactionType = 'Transaction type is required.'
+  }
+
+  validationErrors.value = errors
+  return Object.keys(errors).length === 0
+}
+
 // Add transaction
 const addTransaction = async () => {
+  if (!validateTransaction()) {
+    showToast('Please fill in all required fields.', 'danger', 'bi-exclamation-triangle')
+    return
+  }
+
   isSubmitting.value = true
 
   await new Promise(resolve => setTimeout(resolve, 600))
@@ -1064,6 +1095,7 @@ const addTransaction = async () => {
     transaction_date: new Date().toISOString().split('T')[0],
     expense_income: transactionType.value
   }
+  validationErrors.value = {}
 
   nextTick(() => {
     animateCounters()
