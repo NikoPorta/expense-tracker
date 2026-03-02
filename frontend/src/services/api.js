@@ -2,7 +2,7 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
 const ENVIRONMENT = import.meta.env.VITE_ENVIRONMENT || import.meta.env.ENVIRONMENT || 'development';
 const IS_PRODUCTION = ENVIRONMENT === 'production';
 const TRANSACTIONS_COLLECTION = 'transactions';
